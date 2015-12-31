@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -90,15 +89,10 @@ public class GameView extends SurfaceView implements Runnable {
                     canvas.drawRect(unit.getRect(), unitPaint);
                     if (!unit.getPath().isEmpty()) {
                         pathPaint.setColor(unit.getColor());
+                        pathPaint.setAlpha(64);
                         canvas.drawPath(unit.getPath(), pathPaint);
                     }
                 }
-            }
-
-            // Draw path
-            if (drawingPath) {
-                pathPaint.setColor(selectedUnit.getColor());
-                canvas.drawPath(path, pathPaint);
             }
 
             if (DEBBUGGING) {
@@ -150,8 +144,6 @@ public class GameView extends SurfaceView implements Runnable {
 
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                // check if unit selected
-                Rect unitRect = null;
                 selectedUnit = null;
                 for (Player player : game.getPlayers()) {
                     for (Unit unit : player.getUnits()) {
@@ -168,6 +160,7 @@ public class GameView extends SurfaceView implements Runnable {
                     path.moveTo(selectedUnit.getX(), selectedUnit.getY());
                     pathX = selectedUnit.getX();
                     pathY = selectedUnit.getY();
+                    selectedUnit.setPath(path);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -179,18 +172,18 @@ public class GameView extends SurfaceView implements Runnable {
                         pathX = x;
                         pathY = y;
                     }
+                    selectedUnit.updatePath(path);
                 }
-
                 break;
             case MotionEvent.ACTION_UP:
                 if (drawingPath) {
                     path.lineTo(pathX, pathY);
-                    selectedUnit.setPath(path);
+                    selectedUnit.updatePath(path);
+
                     selectedUnit = null;
                     drawingPath = false;
                     path.reset();
                 }
-
                 break;
         }
 

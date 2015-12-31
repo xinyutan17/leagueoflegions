@@ -17,7 +17,6 @@ public class Unit {
     private Path path;
     private PathMeasure pm;
     private float pathDist; // 0 to 1, representing percentage of path traveled.
-    private float[] pathXY;
 
     public Unit(int x, int y)
     {
@@ -30,7 +29,6 @@ public class Unit {
         path = new Path();
         pm = new PathMeasure();
         pathDist = 0;
-        pathXY = new float[2];
     }
 
     public void update(){
@@ -38,15 +36,19 @@ public class Unit {
             pathDist += speed;
             if (pathDist > pm.getLength()) {
                 pathDist = pm.getLength();
-                path.reset();
-                pm.setPath(null, false);
             }
+            float[] pathXY = new float[2];;
             pm.getPosTan(pathDist, pathXY, null);
             dx = (int)(pathXY[0] - x);
             dy = (int)(pathXY[1] - y);
             x += dx;
             y += dy;
             rect.offset(dx, dy);
+
+            if (pathDist == pm.getLength()) {
+                path.reset();
+                pm.setPath(null, false);
+            }
         }
     }
 
@@ -66,6 +68,11 @@ public class Unit {
         this.path.set(path);
         pm.setPath(path, false);
         pathDist = 0;
+    }
+
+    public void updatePath(Path path) {
+        this.path.set(path);
+        pm.setPath(path, false);
     }
 
     public Path getPath() {
