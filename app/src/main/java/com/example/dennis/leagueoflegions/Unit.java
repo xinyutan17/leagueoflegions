@@ -1,5 +1,6 @@
 package com.example.dennis.leagueoflegions;
 
+import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.Rect;
@@ -10,6 +11,7 @@ public class Unit {
     private int x, y;
     private int dx, dy;
     private int speed;
+    private int color;
 
     private Rect rect;
     private Path path;
@@ -19,6 +21,7 @@ public class Unit {
 
     public Unit(int x, int y)
     {
+        color = Color.BLACK;
         speed = 5;
         this.x = x;
         this.y = y;
@@ -71,5 +74,13 @@ public class Unit {
 
     public Rect getRect() {
         return rect;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 }

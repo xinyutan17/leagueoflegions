@@ -15,7 +15,6 @@ import java.util.ArrayList;
 public class GameView extends SurfaceView implements Runnable {
     private static final boolean DEBBUGGING = true;
     private static final String[] DEBUG_TEXT = new String[]{"","","","",""};
-    private static Rect touchRect = null;
 
     private Game game;
     private volatile boolean playing;
@@ -86,23 +85,21 @@ public class GameView extends SurfaceView implements Runnable {
             // Draw units
             ArrayList<Player> players = game.getPlayers();
             for(Player player : players) {
-                unitPaint.setColor(player.getColor());
-                pathPaint.setColor(player.getColor());
                 for(Unit unit : player.getUnits()) {
+                    unitPaint.setColor(unit.getColor());
                     canvas.drawRect(unit.getRect(), unitPaint);
                     if (!unit.getPath().isEmpty()) {
+                        pathPaint.setColor(unit.getColor());
                         canvas.drawPath(unit.getPath(), pathPaint);
                     }
                 }
             }
 
             // Draw path
-            if (!path.isEmpty()) {
-                pathPaint.setColor(Color.BLACK);
+            if (drawingPath) {
+                pathPaint.setColor(selectedUnit.getColor());
                 canvas.drawPath(path, pathPaint);
             }
-
-
 
             if (DEBBUGGING) {
                 // Debugging text
@@ -111,12 +108,6 @@ public class GameView extends SurfaceView implements Runnable {
                 debugPaint.setColor(Color.BLACK);
                 for(int i = 0; i < DEBUG_TEXT.length; i++) {
                     canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, debugPaint);
-                }
-
-                // Debugging touch rect
-                if (touchRect != null) {
-                    debugPaint.setColor(Color.BLACK);
-                    canvas.drawRect(touchRect, debugPaint);
                 }
             }
 
@@ -160,27 +151,23 @@ public class GameView extends SurfaceView implements Runnable {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 // check if unit selected
-                touchRect = new Rect((int)(x - SELECT_TOLERANCE), (int)(y + SELECT_TOLERANCE), (int)(x + SELECT_TOLERANCE), (int)(y - SELECT_TOLERANCE));
                 Rect unitRect = null;
                 selectedUnit = null;
                 for (Player player : game.getPlayers()) {
                     for (Unit unit : player.getUnits()) {
-                        unitRect = unit.getRect();
-                        DEBUG_TEXT[0] = String.format("UNIT (%d, %d) and TOUCH (%d, %d)", unitRect.centerX(), unitRect.centerY(), touchRect.centerX(), touchRect.centerY());
-                        if (Math.abs(unitRect.centerX() - x) < 40 && Math.abs(unitRect.centerY() - y) < 40) {
+                        if (Math.abs(unit.getX() - x) < Unit.UNIT_SIZE + SELECT_TOLERANCE &&
+                                Math.abs(unit.getY() - y) < Unit.UNIT_SIZE + SELECT_TOLERANCE) {
                             selectedUnit = unit;
                             drawingPath = true;
-                            DEBUG_TEXT[1] = String.format("UNIT (%d, %d) SELECTED", unit.getX(), unit.getY());
-                        } else {
-                            DEBUG_TEXT[1] = String.format("UNIT (%d, %d) NOT SELECTED", unit.getX(), unit.getY());
+                            DEBUG_TEXT[0] = String.format("UNIT (%d, %d) SELECTED", unit.getX(), unit.getY());
                         }
                     }
                 }
                 if (drawingPath) {
                     path.reset();
-                    path.moveTo(x, y);
-                    pathX = x;
-                    pathY = y;
+                    path.moveTo(selectedUnit.getX(), selectedUnit.getY());
+                    pathX = selectedUnit.getX();
+                    pathY = selectedUnit.getY();
                 }
                 break;
             case MotionEvent.ACTION_MOVE:

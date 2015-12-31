@@ -15,6 +15,7 @@ public class Player {
 
     public void addUnit(Unit unit)
     {
+        unit.setColor(color);
         units.add(unit);
     }
 
