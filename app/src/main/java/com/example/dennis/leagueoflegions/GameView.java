@@ -90,7 +90,7 @@ public class GameView extends SurfaceView implements Runnable {
                     if (!unit.getPath().isEmpty()) {
                         pathPaint.setColor(unit.getColor());
                         pathPaint.setAlpha(64);
-                        canvas.drawPath(unit.getPath(), pathPaint);
+                        canvas.drawPath(unit.getRemainingPath(), pathPaint);
                     }
                 }
             }

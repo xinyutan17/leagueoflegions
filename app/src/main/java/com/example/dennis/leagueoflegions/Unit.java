@@ -15,6 +15,7 @@ public class Unit {
 
     private Rect rect;
     private Path path;
+    private Path remainingPath;
     private PathMeasure pm;
     private float pathDist; // 0 to 1, representing percentage of path traveled.
 
@@ -27,6 +28,7 @@ public class Unit {
         dx = dy = 0;
         rect = new Rect(x - UNIT_SIZE, y + UNIT_SIZE, x + UNIT_SIZE, y - UNIT_SIZE);
         path = new Path();
+        remainingPath = new Path();
         pm = new PathMeasure();
         pathDist = 0;
     }
@@ -44,6 +46,9 @@ public class Unit {
             x += dx;
             y += dy;
             rect.offset(dx, dy);
+
+            remainingPath.reset();
+            pm.getSegment(pathDist, pm.getLength(), remainingPath, true);
 
             if (pathDist == pm.getLength()) {
                 path.reset();
@@ -77,6 +82,10 @@ public class Unit {
 
     public Path getPath() {
         return path;
+    }
+
+    public Path getRemainingPath() {
+        return remainingPath;
     }
 
     public Rect getRect() {
