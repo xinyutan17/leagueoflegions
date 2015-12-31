@@ -2,6 +2,7 @@ package com.example.dennis.leagueoflegions;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -55,8 +56,12 @@ public class GameView extends SurfaceView implements Runnable {
 
             //First we lock the area of memory we will be drawing to
             canvas = surfaceHolder.lockCanvas();
+
+
+            paint.setColor(Color.WHITE);
             canvas.drawPaint(paint);
 
+            paint.setColor(Color.BLUE);
             ArrayList<Player> players = game.getPlayers();
             for(Player p : players)
             {
@@ -67,7 +72,7 @@ public class GameView extends SurfaceView implements Runnable {
 
                     for(int i = -10; i <= 10; i++) {
                         for (int j = -10; j <= 10; j++) {
-                            canvas.drawCircle(x + 20*i, y + 20*i, 5, paint);
+                            canvas.drawCircle(x + 20*i, y + 20*j, 5, paint);
                         }
                     }
                 }
