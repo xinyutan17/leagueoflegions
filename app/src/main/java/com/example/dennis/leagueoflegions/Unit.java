@@ -1,22 +1,50 @@
 package com.example.dennis.leagueoflegions;
 
-import android.content.Context;
-import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathMeasure;
+import android.graphics.Rect;
 
 public class Unit {
+    public static final int UNIT_SIZE = 20;
+
     private int x, y;
+    private int dx, dy;
     private int speed;
 
-    public Unit()
+    private Rect rect;
+    private Path path;
+    private PathMeasure pm;
+    private float pathDist; // 0 to 1, representing percentage of path traveled.
+    private float[] pathXY;
+
+    public Unit(int x, int y)
     {
-        speed = 1;
-        x = 10;
-        y = 10;
+        speed = 5;
+        this.x = x;
+        this.y = y;
+        dx = dy = 0;
+        rect = new Rect(x - UNIT_SIZE, y + UNIT_SIZE, x + UNIT_SIZE, y - UNIT_SIZE);
+        path = new Path();
+        pm = new PathMeasure();
+        pathDist = 0;
+        pathXY = new float[2];
     }
 
     public void update(){
-        x += speed;
-        y += speed;
+        if (!path.isEmpty()) {
+            pathDist += speed;
+            if (pathDist > pm.getLength()) {
+                pathDist = pm.getLength();
+                path.reset();
+                pm.setPath(null, false);
+            }
+            pm.getPosTan(pathDist, pathXY, null);
+            dx = (int)(pathXY[0] - x);
+            dy = (int)(pathXY[1] - y);
+            x += dx;
+            y += dy;
+            rect.offset(dx, dy);
+        }
     }
 
     public int getX(){
@@ -29,5 +57,19 @@ public class Unit {
 
     public int getSpeed() {
         return speed;
+    }
+
+    public void setPath(Path path) {
+        this.path.set(path);
+        pm.setPath(path, false);
+        pathDist = 0;
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public Rect getRect() {
+        return rect;
     }
 }

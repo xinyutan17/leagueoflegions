@@ -11,10 +11,10 @@ public class Game {
         players = new ArrayList<Player>();
 
         Player p1 = new Player();
-        p1.addUnit(new Base());
+//        p1.addUnit(new Base(200, 200));
 
         Player p2 = new Player();
-        p2.addUnit(new Base());
+        p2.addUnit(new Base(100, 100));
 
         players.add(p1);
         players.add(p2);
