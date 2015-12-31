@@ -22,29 +22,35 @@ public class GameView extends SurfaceView implements Runnable {
     private Thread gameThread = null;
     private static final int FPS = 60;
 
-    private Paint paint;
+    private Paint debugPaint;
+    private Paint unitPaint;
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
 
     private Path path;
     private Paint pathPaint;
+    private Paint mapPaint;
     private float pathX, pathY;
+    private boolean drawingPath;
     private static final float TOUCH_TOLERANCE = 5;
     private Unit selectedUnit;
     private static final int SELECT_TOLERANCE = 20;
 
     public GameView(Context context, Game game){
         super(context);
-        paint = new Paint();
+
         surfaceHolder = getHolder();
         this.game = game;
         path = new Path();
         selectedUnit = null;
 
+        mapPaint = new Paint();
+        debugPaint = new Paint();
+        unitPaint = new Paint();
         pathPaint = new Paint();
-        pathPaint.setColor(Color.RED);
         pathPaint.setStyle(Paint.Style.STROKE);
         pathPaint.setStrokeWidth(4f);
+        drawingPath = false;
     }
 
     @Override
@@ -74,35 +80,44 @@ public class GameView extends SurfaceView implements Runnable {
             canvas = surfaceHolder.lockCanvas();
 
             // Draw map
-            paint.setColor(Color.WHITE);
-            canvas.drawPaint(paint);
+            mapPaint.setColor(Color.WHITE);
+            canvas.drawPaint(mapPaint);
 
             // Draw units
-            paint.setColor(Color.BLUE);
             ArrayList<Player> players = game.getPlayers();
-            for(Player p : players) {
-                for(Unit unit : p.getUnits()) {
-                    canvas.drawRect(unit.getRect(), paint);
+            for(Player player : players) {
+                unitPaint.setColor(player.getColor());
+                pathPaint.setColor(player.getColor());
+                for(Unit unit : player.getUnits()) {
+                    canvas.drawRect(unit.getRect(), unitPaint);
+                    if (!unit.getPath().isEmpty()) {
+                        canvas.drawPath(unit.getPath(), pathPaint);
+                    }
                 }
             }
 
             // Draw path
-            canvas.drawPath(path, pathPaint);
-
-            // Debugging text
-            if (DEBBUGGING) {
-                paint.setTextSize(20);
-                paint.setTextAlign(Paint.Align.LEFT);
-                paint.setColor(Color.BLACK);
-                for(int i = 0; i < DEBUG_TEXT.length; i++) {
-                    canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, paint);
-                }
+            if (!path.isEmpty()) {
+                pathPaint.setColor(Color.BLACK);
+                canvas.drawPath(path, pathPaint);
             }
 
-            // Debugging touch rect
-            if (touchRect != null) {
-                paint.setColor(Color.GREEN);
-                canvas.drawRect(touchRect, paint);
+
+
+            if (DEBBUGGING) {
+                // Debugging text
+                debugPaint.setTextSize(20);
+                debugPaint.setTextAlign(Paint.Align.LEFT);
+                debugPaint.setColor(Color.BLACK);
+                for(int i = 0; i < DEBUG_TEXT.length; i++) {
+                    canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, debugPaint);
+                }
+
+                // Debugging touch rect
+                if (touchRect != null) {
+                    debugPaint.setColor(Color.BLACK);
+                    canvas.drawRect(touchRect, debugPaint);
+                }
             }
 
             // Unlock and draw the scene
@@ -154,39 +169,41 @@ public class GameView extends SurfaceView implements Runnable {
                         DEBUG_TEXT[0] = String.format("UNIT (%d, %d) and TOUCH (%d, %d)", unitRect.centerX(), unitRect.centerY(), touchRect.centerX(), touchRect.centerY());
                         if (Math.abs(unitRect.centerX() - x) < 40 && Math.abs(unitRect.centerY() - y) < 40) {
                             selectedUnit = unit;
+                            drawingPath = true;
                             DEBUG_TEXT[1] = String.format("UNIT (%d, %d) SELECTED", unit.getX(), unit.getY());
                         } else {
                             DEBUG_TEXT[1] = String.format("UNIT (%d, %d) NOT SELECTED", unit.getX(), unit.getY());
                         }
                     }
                 }
-                if (selectedUnit == null) {
-                    return true;
-                }
-                path.reset();
-                path.moveTo(x, y);
-                pathX = x;
-                pathY = y;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (selectedUnit == null) {
-                    return true;
-                }
-                float dx = Math.abs(x - pathX);
-                float dy = Math.abs(y - pathY);
-                if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-                    path.quadTo(pathX, pathY, (x + pathX)/2, (y + pathY)/2);
+                if (drawingPath) {
+                    path.reset();
+                    path.moveTo(x, y);
                     pathX = x;
                     pathY = y;
                 }
                 break;
-            case MotionEvent.ACTION_UP:
-                if (selectedUnit == null) {
-                    return true;
+            case MotionEvent.ACTION_MOVE:
+                if (drawingPath) {
+                    float dx = Math.abs(x - pathX);
+                    float dy = Math.abs(y - pathY);
+                    if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+                        path.quadTo(pathX, pathY, (x + pathX)/2, (y + pathY)/2);
+                        pathX = x;
+                        pathY = y;
+                    }
                 }
-                path.lineTo(pathX, pathY);
-                selectedUnit.setPath(path);
-                selectedUnit = null;
+
+                break;
+            case MotionEvent.ACTION_UP:
+                if (drawingPath) {
+                    path.lineTo(pathX, pathY);
+                    selectedUnit.setPath(path);
+                    selectedUnit = null;
+                    drawingPath = false;
+                    path.reset();
+                }
+
                 break;
         }
 

@@ -1,5 +1,7 @@
 package com.example.dennis.leagueoflegions;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 
 public class Game {
@@ -10,10 +12,10 @@ public class Game {
     public Game(){
         players = new ArrayList<Player>();
 
-        Player p1 = new Player();
-//        p1.addUnit(new Base(200, 200));
+        Player p1 = new Player(Color.BLUE);
+        p1.addUnit(new Base(200, 200));
 
-        Player p2 = new Player();
+        Player p2 = new Player(Color.RED);
         p2.addUnit(new Base(100, 100));
 
         players.add(p1);
