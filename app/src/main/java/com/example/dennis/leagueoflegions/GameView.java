@@ -12,6 +12,7 @@ import android.view.SurfaceView;
 import java.util.ArrayList;
 
 public class GameView extends SurfaceView implements Runnable {
+
     private static final boolean DEBBUGGING = true;
     private static final String[] DEBUG_TEXT = new String[]{"","","","",""};
 
@@ -75,6 +76,7 @@ public class GameView extends SurfaceView implements Runnable {
     private void draw()
     {
         if (surfaceHolder.getSurface().isValid()) {
+
             canvas = surfaceHolder.lockCanvas();
 
             // Draw map
@@ -94,7 +96,7 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                 }
             }
-
+            /*
             if (DEBBUGGING) {
                 // Debugging text
                 debugPaint.setTextSize(20);
@@ -104,7 +106,7 @@ public class GameView extends SurfaceView implements Runnable {
                     canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, debugPaint);
                 }
             }
-
+            */
             // Unlock and draw the scene
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
