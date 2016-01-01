@@ -18,6 +18,7 @@ public class Unit {
     private Path remainingPath;
     private PathMeasure pm;
     private float pathDist; // 0 to 1, representing percentage of path traveled.
+    private String type;
 
     public Unit(int x, int y)
     {
@@ -98,5 +99,10 @@ public class Unit {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 }

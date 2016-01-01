@@ -77,6 +77,26 @@ public class GameView extends SurfaceView implements Runnable {
     {
         if (surfaceHolder.getSurface().isValid()) {
 
+            /*
+            //First we lock the area of memory we will be drawing to
+
+            paint.setColor(Color.WHITE);
+            canvas.drawPaint(paint);
+
+            paint.setColor(Color.BLUE);
+            ArrayList<Player> players = game.getPlayers();
+            for(Player p : players)
+            {
+                for(Unit unit : p.getUnits())
+                {
+
+                }
+            }
+
+            // Unlock and draw the scene
+            surfaceHolder.unlockCanvasAndPost(canvas);
+            */
+
             canvas = surfaceHolder.lockCanvas();
 
             // Draw map
@@ -87,11 +107,25 @@ public class GameView extends SurfaceView implements Runnable {
             ArrayList<Player> players = game.getPlayers();
             for(Player player : players) {
                 for(Unit unit : player.getUnits()) {
-                    unitPaint.setColor(unit.getColor());
-                    canvas.drawRect(unit.getRect(), unitPaint);
-                    if (!unit.getPath().isEmpty()) {
-                        pathPaint.setColor(unit.getColor());
-                        pathPaint.setAlpha(64);
+                    if(unit.getType().equals("rectangle")) {
+                        unitPaint.setColor(unit.getColor());
+                        canvas.drawRect(unit.getRect(), unitPaint);
+                        if (!unit.getPath().isEmpty()) {
+                            pathPaint.setColor(unit.getColor());
+                            pathPaint.setAlpha(64);
+                            canvas.drawPath(unit.getRemainingPath(), pathPaint);
+                        }
+                    }
+                    else {
+                        int x = unit.getX();
+                        int y = unit.getY();
+
+                        for(int i = -10; i <= 10; i++) {
+                            for (int j = -10; j <= 10; j++) {
+                                canvas.drawCircle(x + 20*i, y + 20*j, 5, unitPaint);
+                            }
+                        }
+
                         canvas.drawPath(unit.getRemainingPath(), pathPaint);
                     }
                 }
