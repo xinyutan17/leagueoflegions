@@ -77,25 +77,6 @@ public class GameView extends SurfaceView implements Runnable {
     {
         if (surfaceHolder.getSurface().isValid()) {
 
-            /*
-            //First we lock the area of memory we will be drawing to
-
-            paint.setColor(Color.WHITE);
-            canvas.drawPaint(paint);
-
-            paint.setColor(Color.BLUE);
-            ArrayList<Player> players = game.getPlayers();
-            for(Player p : players)
-            {
-                for(Unit unit : p.getUnits())
-                {
-
-                }
-            }
-
-            // Unlock and draw the scene
-            surfaceHolder.unlockCanvasAndPost(canvas);
-            */
 
             canvas = surfaceHolder.lockCanvas();
 
@@ -107,7 +88,7 @@ public class GameView extends SurfaceView implements Runnable {
             ArrayList<Player> players = game.getPlayers();
             for(Player player : players) {
                 for(Unit unit : player.getUnits()) {
-                    if(unit.getType().equals("rectangle")) {
+                    if(unit.getType().equals("base")) {
                         unitPaint.setColor(unit.getColor());
                         canvas.drawRect(unit.getRect(), unitPaint);
                         if (!unit.getPath().isEmpty()) {
@@ -116,7 +97,7 @@ public class GameView extends SurfaceView implements Runnable {
                             canvas.drawPath(unit.getRemainingPath(), pathPaint);
                         }
                     }
-                    else {
+                    else if (unit.getType().equals("army")){
                         int x = unit.getX();
                         int y = unit.getY();
 
@@ -130,7 +111,7 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                 }
             }
-            /*
+
             if (DEBBUGGING) {
                 // Debugging text
                 debugPaint.setTextSize(20);
@@ -140,7 +121,7 @@ public class GameView extends SurfaceView implements Runnable {
                     canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, debugPaint);
                 }
             }
-            */
+
             // Unlock and draw the scene
             surfaceHolder.unlockCanvasAndPost(canvas);
         }

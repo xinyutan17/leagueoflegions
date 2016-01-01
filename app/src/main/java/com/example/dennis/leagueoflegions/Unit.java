@@ -5,7 +5,7 @@ import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.Rect;
 
-public class Unit {
+public abstract class Unit {
     public static final int UNIT_SIZE = 20;
 
     private int x, y;
@@ -18,7 +18,6 @@ public class Unit {
     private Path remainingPath;
     private PathMeasure pm;
     private float pathDist; // 0 to 1, representing percentage of path traveled.
-    private String type;
 
     public Unit(int x, int y)
     {
@@ -101,8 +100,6 @@ public class Unit {
         this.color = color;
     }
 
-    public String getType()
-    {
-        return type;
-    }
+
+    public abstract String getType();
 }
