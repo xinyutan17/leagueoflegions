@@ -100,6 +100,5 @@ public abstract class Unit {
         this.color = color;
     }
 
-
     public abstract String getType();
 }
