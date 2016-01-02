@@ -86,16 +86,10 @@ public class GameView extends SurfaceView implements Runnable {
             ArrayList<Player> players = game.getPlayers();
             for(Player player : players) {
                 for(Unit unit : player.getUnits()) {
+                    unitPaint.setColor(unit.getColor());
                     if(unit.getType().equals("base")) {
-                        unitPaint.setColor(unit.getColor());
                         canvas.drawRect(unit.getRect(), unitPaint);
-                        if (!unit.getPath().isEmpty()) {
-                            pathPaint.setColor(unit.getColor());
-                            pathPaint.setAlpha(64);
-                            canvas.drawPath(unit.getRemainingPath(), pathPaint);
-                        }
-                    }
-                    else if (unit.getType().equals("army")){
+                    } else if (unit.getType().equals("army")){
                         int x = unit.getX();
                         int y = unit.getY();
 
@@ -105,7 +99,11 @@ public class GameView extends SurfaceView implements Runnable {
                             }
                         }
                     }
-                    canvas.drawPath(unit.getRemainingPath(), pathPaint);
+                    if (!unit.getPath().isEmpty()) {
+                        pathPaint.setColor(unit.getColor());
+                        pathPaint.setAlpha(64);
+                        canvas.drawPath(unit.getRemainingPath(), pathPaint);
+                    }
                 }
             }
 
