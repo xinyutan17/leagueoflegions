@@ -76,8 +76,6 @@ public class GameView extends SurfaceView implements Runnable {
     private void draw()
     {
         if (surfaceHolder.getSurface().isValid()) {
-
-
             canvas = surfaceHolder.lockCanvas();
 
             // Draw map
@@ -106,9 +104,8 @@ public class GameView extends SurfaceView implements Runnable {
                                 canvas.drawCircle(x + 20*i, y + 20*j, 5, unitPaint);
                             }
                         }
-
-                        canvas.drawPath(unit.getRemainingPath(), pathPaint);
                     }
+                    canvas.drawPath(unit.getRemainingPath(), pathPaint);
                 }
             }
 
