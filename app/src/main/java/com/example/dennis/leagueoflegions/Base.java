@@ -1,6 +1,8 @@
 package com.example.dennis.leagueoflegions;
 
 public class Base extends Unit {
+    private static final String TYPE = "base";
+
     public static final float SPAWN_TIME = 3.0f;
     public static final int SPAWN_DISTANCE = 20;
 
@@ -24,5 +26,11 @@ public class Base extends Unit {
             selfPlayer.addUnit(new Army(selfPlayer, spawnX, spawnY));
             lastSpawnTime = updateTime;
         }
+    }
+
+    @Override
+    public String getType()
+    {
+        return TYPE;
     }
 }

@@ -12,6 +12,7 @@ import android.view.SurfaceView;
 import java.util.ArrayList;
 
 public class GameView extends SurfaceView implements Runnable {
+
     private static final boolean DEBBUGGING = true;
     private static final String[] DEBUG_TEXT = new String[]{"","","","",""};
 
@@ -93,7 +94,18 @@ public class GameView extends SurfaceView implements Runnable {
             for(Player player : players) {
                 for(Unit unit : player.getUnits()) {
                     unitPaint.setColor(unit.getColor());
-                    canvas.drawRect(unit.getRect(), unitPaint);
+                    if(unit.getType().equals("base")) {
+                        canvas.drawRect(unit.getRect(), unitPaint);
+                    } else if (unit.getType().equals("army")){
+                        int x = unit.getX();
+                        int y = unit.getY();
+
+                        for(int i = -10; i <= 10; i++) {
+                            for (int j = -10; j <= 10; j++) {
+                                canvas.drawCircle(x + 20*i, y + 20*j, 5, unitPaint);
+                            }
+                        }
+                    }
                     if (!unit.getPath().isEmpty()) {
                         pathPaint.setColor(unit.getColor());
                         pathPaint.setAlpha(64);

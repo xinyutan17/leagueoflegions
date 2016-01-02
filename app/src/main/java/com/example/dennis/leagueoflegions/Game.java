@@ -18,12 +18,12 @@ public class Game {
         players = new ArrayList<Player>();
 
         Player p1 = new Player(this, Color.BLUE);
-        p1.addUnit(new Base(p1, 200, 200));
-        p1.addUnit(new Army(p1, 50, 50));
+        p1.addUnit(new Base(p1, 100, 100));
+        p1.addUnit(new Army(p1, 100, 500));
 
         Player p2 = new Player(this, Color.RED);
-        p2.addUnit(new Base(p2, 100, 100));
-        p2.addUnit(new Army(p2, 50, 50));
+        p2.addUnit(new Base(p2, 800, 100));
+        p2.addUnit(new Army(p2, 800, 500));
 
         players.add(p1);
         players.add(p2);
