@@ -4,11 +4,13 @@ import java.util.ArrayList;
 
 public class Player {
 
+    private Game game;
     private ArrayList<Unit> units;
     private int color;
 
-    public Player(int color)
+    public Player(Game game, int color)
     {
+        this.game = game;
         units = new ArrayList<>();
         this.color = color;
     }
@@ -26,5 +28,9 @@ public class Player {
 
     public int getColor() {
         return color;
+    }
+
+    public Game getGame() {
+        return game;
     }
 }
