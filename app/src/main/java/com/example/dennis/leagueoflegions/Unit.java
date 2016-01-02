@@ -5,7 +5,7 @@ import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.Rect;
 
-public class Unit {
+public abstract class Unit {
     public static final int UNIT_SIZE = 20;
 
     private int x, y;
@@ -99,4 +99,6 @@ public class Unit {
     public void setColor(int color) {
         this.color = color;
     }
+
+    public abstract String getType();
 }
