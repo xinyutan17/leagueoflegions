@@ -9,13 +9,11 @@ import android.view.SurfaceView;
 
 public class Map extends SurfaceView
 {
-    private Bitmap[][] tiledImages;
     private Bitmap finalImage;
 
     public Map(Context context)
     {
         super(context);
-        tiledImages = new Bitmap[2][1];
     }
 
     public Bitmap getFinalImage()
@@ -30,10 +28,10 @@ public class Map extends SurfaceView
 
     public Bitmap loadImage()
     {
-        return combineImages(tiledImages);
+        return combineImages();
     }
 
-    private Bitmap combineImages(Bitmap [][] images)
+    private Bitmap combineImages()
     {
         Bitmap[] parts = new Bitmap[20];
         for(int j = 0; j < parts.length; j++)
