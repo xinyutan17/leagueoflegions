@@ -40,11 +40,14 @@ public class GameView extends SurfaceView implements Runnable {
     private Unit selectedUnit;
     private static final int SELECT_TOLERANCE = 20;
 
+    private Map map;
+
     // new variables added for tesing tiled images
     Bitmap mBitmap;
     BitmapDrawable mDrawable;
+    private int numTimesDrawn;
 
-    public GameView(Context context, Game game){
+    public GameView(Context context, Game game, Map map){
         super(context);
 
         surfaceHolder = getHolder();
@@ -59,6 +62,9 @@ public class GameView extends SurfaceView implements Runnable {
         pathPaint.setStyle(Paint.Style.STROKE);
         pathPaint.setStrokeWidth(4f);
         drawingPath = false;
+
+        this.map = map;
+        numTimesDrawn = 0;
     }
 
     @Override
@@ -92,12 +98,14 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawPaint(mapPaint);
 
             // added in order to tile images to render the map
+
+            /*
             for(int j = 0; j < canvas.getWidth(); j += 200)
             {
                 for(int k = 0; k < canvas.getHeight(); k += 200)
                 {
                     Rect rect = new Rect(j, k, j + 200, k + 200);
-                    mBitmap = loadBitmap();
+                    mBitmap = map.loadImage();
                     mDrawable = new BitmapDrawable(getResources(), mBitmap);
                     //mDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
                     mDrawable.setBounds(rect);
@@ -105,6 +113,19 @@ public class GameView extends SurfaceView implements Runnable {
                     mDrawable.draw(canvas);
                 }
             }
+            */
+
+            if(numTimesDrawn == 0)
+            {
+                map.setFinalImage();
+                numTimesDrawn++;
+            }
+
+            Rect rect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
+            mBitmap = map.getFinalImage();
+            mDrawable = new BitmapDrawable(getResources(), mBitmap);
+            mDrawable.setBounds(rect);
+            mDrawable.draw(canvas);
 
             // Draw units
             ArrayList<Player> players = game.getPlayers();
@@ -170,53 +191,6 @@ public class GameView extends SurfaceView implements Runnable {
         playing = true;
         gameThread = new Thread(this);
         gameThread.start();
-    }
-
-    public Bitmap loadBitmap() {
-
-        int value = (int)(Math.random() * 12);
-        Bitmap bm = null;
-
-        switch (value){
-            case 0:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.forest_tile);
-                break;
-            case 1:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.desert_tile);
-                break;
-            case 2:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.forest_tile);
-                break;
-            case 3:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.ice_tile);
-                break;
-            case 4:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.jungle_tile);
-                break;
-            case 5:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.mountain_tile);
-                break;
-            case 6:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.swamp_tile);
-                break;
-            case 7:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.wall_tile);
-                break;
-            case 8:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.water_tile);
-                break;
-            case 9:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.ground_tile);
-                break;
-            case 10:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.ground_tile);
-                break;
-            case 11:
-                bm = BitmapFactory.decodeResource(getResources(), R.drawable.ground_tile);
-                break;
-
-        }
-        return bm;
     }
 
     @Override
