@@ -1,185 +1,166 @@
+/*
+ * Copyright (C) 2011 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.dennis.leagueoflegions;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
+import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
+import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.Context;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView.Renderer;
-import android.opengl.Matrix;
+/**
+ * Provides drawing instructions for a GLSurfaceView object. This class
+ * must override the OpenGL ES drawing lifecycle methods:
+ * <ul>
+ *   <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceCreated}</li>
+ *   <li>{@link android.opengl.GLSurfaceView.Renderer#onDrawFrame}</li>
+ *   <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceChanged}</li>
+ * </ul>
+ */
+public class GLRenderer implements GLSurfaceView.Renderer {
 
-public class GLRenderer implements Renderer {
+    private static final String TAG = "MyGLRenderer";
+    private Triangle mTriangle;
+    private Square mSquare;
 
-    // Our matrices
-    private final float[] mtrxProjection = new float[16];
-    private final float[] mtrxView = new float[16];
-    private final float[] mtrxProjectionAndView = new float[16];
+    // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
+    private final float[] mMVPMatrix = new float[16];
+    private final float[] mProjectionMatrix = new float[16];
+    private final float[] mViewMatrix = new float[16];
+    private final float[] mRotationMatrix = new float[16];
 
-    // Geometric variables
-    public static float vertices[];
-    public static short indices[];
-    public FloatBuffer vertexBuffer;
-    public ShortBuffer drawListBuffer;
+    private float mAngle;
 
-    // Our screenresolution
-    float   mScreenWidth = 1280;
-    float   mScreenHeight = 768;
+    @Override
+    public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
-    // Misc
-    Context mContext;
-    long mLastTime;
-    int mProgram;
+        // Set the background frame color
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    public GLRenderer(Context c)
-    {
-        mContext = c;
-        mLastTime = System.currentTimeMillis() + 100;
-    }
-
-    public void onPause()
-    {
-        /* Do stuff to pause the renderer */
-    }
-
-    public void onResume()
-    {
-        /* Do stuff to resume the renderer */
-        mLastTime = System.currentTimeMillis();
+        mTriangle = new Triangle();
+        mSquare   = new Square();
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
+        float[] scratch = new float[16];
 
-        // Get the current time
-        long now = System.currentTimeMillis();
-
-        // We should make sure we are valid and sane
-        if (mLastTime > now) return;
-
-        // Get the amount of time the last frame took.
-        long elapsed = now - mLastTime;
-
-        // Update our example
-
-        // Render our example
-        Render(mtrxProjectionAndView);
-
-        // Save the current time to see how long it took <img src="http://androidblog.reindustries.com/wp-includes/images/smilies/icon_smile.gif" alt=":)" class="wp-smiley"> .
-        mLastTime = now;
-
-    }
-
-    private void Render(float[] m) {
-
-        // clear Screen and Depth Buffer, we have set the clear color as black.
+        // Draw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // get handle to vertex shader's vPosition member
-        int mPositionHandle = GLES20.glGetAttribLocation(riGraphicTools.sp_SolidColor, "vPosition");
-
-        // Enable generic vertex attribute array
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-
-        // Prepare the triangle coordinate data
-        GLES20.glVertexAttribPointer(mPositionHandle, 3,
-                GLES20.GL_FLOAT, false,
-                0, vertexBuffer);
-
-        // Get handle to shape's transformation matrix
-        int mtrxhandle = GLES20.glGetUniformLocation(riGraphicTools.sp_SolidColor, "uMVPMatrix");
-
-        // Apply the projection and view transformation
-        GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
-
-        // Draw the triangle
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
-
-        // Disable vertex array
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
-
-    }
-
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-
-        // We need to know the current width and height.
-        mScreenWidth = width;
-        mScreenHeight = height;
-
-        // Redo the Viewport, making it fullscreen.
-        GLES20.glViewport(0, 0, (int)mScreenWidth, (int)mScreenHeight);
-
-        // Clear our matrices
-        for(int i=0;i<16;i++)
-        {
-            mtrxProjection[i] = 0.0f;
-            mtrxView[i] = 0.0f;
-            mtrxProjectionAndView[i] = 0.0f;
-        }
-
-        // Setup our screen width and height for normal sprite translation.
-        Matrix.orthoM(mtrxProjection, 0, 0f, mScreenWidth, 0.0f, mScreenHeight, 0, 50);
-
         // Set the camera position (View matrix)
-        Matrix.setLookAtM(mtrxView, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
         // Calculate the projection and view transformation
-        Matrix.multiplyMM(mtrxProjectionAndView, 0, mtrxProjection, 0, mtrxView, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
+        // Draw square
+        mSquare.draw(mMVPMatrix);
+
+        // Create a rotation for the triangle
+
+        // Use the following code to generate constant rotation.
+        // Leave this code out when using TouchEvents.
+        // long time = SystemClock.uptimeMillis() % 4000L;
+        // float angle = 0.090f * ((int) time);
+
+        Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, 1.0f);
+
+        // Combine the rotation matrix with the projection and camera view
+        // Note that the mMVPMatrix factor *must be first* in order
+        // for the matrix multiplication product to be correct.
+        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+
+        // Draw triangle
+        mTriangle.draw(scratch);
     }
 
     @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    public void onSurfaceChanged(GL10 unused, int width, int height) {
+        // Adjust the viewport based on geometry changes,
+        // such as screen rotation
+        GLES20.glViewport(0, 0, width, height);
 
-        // Create the triangle
-        SetupTriangle();
+        float ratio = (float) width / height;
 
-        // Set the clear color to black
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);
-
-        // Create the shaders
-        int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_SolidColor);
-        int fragmentShader = riGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER, riGraphicTools.fs_SolidColor);
-
-        riGraphicTools.sp_SolidColor = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(riGraphicTools.sp_SolidColor, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(riGraphicTools.sp_SolidColor, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(riGraphicTools.sp_SolidColor);                  // creates OpenGL ES program executables
-
-        // Set our shader programm
-        GLES20.glUseProgram(riGraphicTools.sp_SolidColor);
-    }
-
-    public void SetupTriangle()
-    {
-        // We have create the vertices of our view.
-        vertices = new float[]
-                {10.0f, 200f, 0.0f,
-                        10.0f, 100f, 0.0f,
-                        100f, 100f, 0.0f,
-                };
-
-        indices = new short[] {0, 1, 2}; // loop in the android official tutorial opengles why different order.
-
-        // The vertex buffer.
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(vertices);
-        vertexBuffer.position(0);
-
-        // initialize byte buffer for the draw list
-        ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(indices);
-        drawListBuffer.position(0);
+        // this projection matrix is applied to object coordinates
+        // in the onDrawFrame() method
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
 
     }
+
+    /**
+     * Utility method for compiling a OpenGL shader.
+     *
+     * <p><strong>Note:</strong> When developing shaders, use the checkGlError()
+     * method to debug shader coding errors.</p>
+     *
+     * @param type - Vertex or fragment shader type.
+     * @param shaderCode - String containing the shader code.
+     * @return - Returns an id for the shader.
+     */
+    public static int loadShader(int type, String shaderCode){
+
+        // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
+        // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
+        int shader = GLES20.glCreateShader(type);
+
+        // add the source code to the shader and compile it
+        GLES20.glShaderSource(shader, shaderCode);
+        GLES20.glCompileShader(shader);
+
+        return shader;
+    }
+
+    /**
+     * Utility method for debugging OpenGL calls. Provide the name of the call
+     * just after making it:
+     *
+     * <pre>
+     * mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+     * MyGLRenderer.checkGlError("glGetUniformLocation");</pre>
+     *
+     * If the operation is not successful, the check throws an error.
+     *
+     * @param glOperation - Name of the OpenGL call to check.
+     */
+    public static void checkGlError(String glOperation) {
+        int error;
+        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+            Log.e(TAG, glOperation + ": glError " + error);
+            throw new RuntimeException(glOperation + ": glError " + error);
+        }
+    }
+
+    /**
+     * Returns the rotation angle of the triangle shape (mTriangle).
+     *
+     * @return - A float representing the rotation angle.
+     */
+    public float getAngle() {
+        return mAngle;
+    }
+
+    /**
+     * Sets the rotation angle of the triangle shape (mTriangle).
+     */
+    public void setAngle(float angle) {
+        mAngle = angle;
+    }
+
 }
