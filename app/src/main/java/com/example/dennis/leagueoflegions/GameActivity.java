@@ -16,8 +16,8 @@ public class GameActivity extends Activity {
         String game_mode = extras.getString(Game.GAME_MODE);
 
         game = new Game();
-
-        gameView = new GameView(this, game);
+        Map map = new Map(this);
+        gameView = new GameView(this, game, map);
         setContentView(gameView);
     }
 

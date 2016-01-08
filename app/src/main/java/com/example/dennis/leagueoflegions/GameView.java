@@ -1,10 +1,15 @@
 package com.example.dennis.leagueoflegions;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -35,7 +40,14 @@ public class GameView extends SurfaceView implements Runnable {
     private Unit selectedUnit;
     private static final int SELECT_TOLERANCE = 20;
 
-    public GameView(Context context, Game game){
+    private Map map;
+
+    // new variables added for tesing tiled images
+    Bitmap mBitmap;
+    BitmapDrawable mDrawable;
+    private int numTimesDrawn;
+
+    public GameView(Context context, Game game, Map map){
         super(context);
 
         surfaceHolder = getHolder();
@@ -50,6 +62,9 @@ public class GameView extends SurfaceView implements Runnable {
         pathPaint.setStyle(Paint.Style.STROKE);
         pathPaint.setStrokeWidth(4f);
         drawingPath = false;
+
+        this.map = map;
+        numTimesDrawn = 0;
     }
 
     @Override
@@ -88,6 +103,36 @@ public class GameView extends SurfaceView implements Runnable {
             // Draw map
             mapPaint.setColor(Color.WHITE);
             canvas.drawPaint(mapPaint);
+
+            // added in order to tile images to render the map
+
+            /*
+            for(int j = 0; j < canvas.getWidth(); j += 200)
+            {
+                for(int k = 0; k < canvas.getHeight(); k += 200)
+                {
+                    Rect rect = new Rect(j, k, j + 200, k + 200);
+                    mBitmap = map.loadImage();
+                    mDrawable = new BitmapDrawable(getResources(), mBitmap);
+                    //mDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+                    mDrawable.setBounds(rect);
+                    // testing code added for tiled images
+                    mDrawable.draw(canvas);
+                }
+            }
+            */
+
+            if(numTimesDrawn == 0)
+            {
+                map.setFinalImage();
+                numTimesDrawn++;
+            }
+
+            Rect rect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
+            mBitmap = map.getFinalImage();
+            mDrawable = new BitmapDrawable(getResources(), mBitmap);
+            mDrawable.setBounds(rect);
+            mDrawable.draw(canvas);
 
             // Draw units
             ArrayList<Player> players = game.getPlayers();
