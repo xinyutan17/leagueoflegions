@@ -11,6 +11,7 @@ public abstract class Unit {
     private int x, y;
     private int dx, dy;
     private int speed;
+    private Player player;
     private int color;
 
     private Rect rect;
@@ -19,8 +20,9 @@ public abstract class Unit {
     private PathMeasure pm;
     private float pathDist; // 0 to 1, representing percentage of path traveled.
 
-    public Unit(int x, int y)
+    public Unit(Player player, int x, int y)
     {
+        this.player = player;
         color = Color.BLACK;
         speed = 5;
         this.x = x;
@@ -98,6 +100,10 @@ public abstract class Unit {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public abstract String getType();

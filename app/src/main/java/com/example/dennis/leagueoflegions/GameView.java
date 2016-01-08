@@ -63,12 +63,19 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void update(){
+        game.updateTime();
+        DEBUG_TEXT[0] = game.getTime() + "";
+
         ArrayList<Player> players = game.getPlayers();
         for(Player p : players)
         {
-            for(Unit unit : p.getUnits())
+            // WARNING: currently each players units can be changed
+            // while iterating through this units (e.g. base spawns new armies)
+            // Make sure each unit gets properly updated
+            ArrayList<Unit> units = p.getUnits();
+            for(int i = 0; i < units.size(); i++)
             {
-                unit.update();
+                units.get(i).update();
             }
         }
     }
@@ -163,7 +170,6 @@ public class GameView extends SurfaceView implements Runnable {
                                 Math.abs(unit.getY() - y) < Unit.UNIT_SIZE + SELECT_TOLERANCE) {
                             selectedUnit = unit;
                             drawingPath = true;
-                            DEBUG_TEXT[0] = String.format("UNIT (%d, %d) SELECTED", unit.getX(), unit.getY());
                         }
                     }
                 }
