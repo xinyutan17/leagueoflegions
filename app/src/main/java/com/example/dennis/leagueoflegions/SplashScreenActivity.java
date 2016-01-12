@@ -33,7 +33,6 @@ public class SplashScreenActivity extends Activity {
     }
 
     public void openSettings(View view) {
-        Intent intent = new Intent(this, GLActivity.class);
-        startActivity(intent);
+        // TODO
     }
 }
