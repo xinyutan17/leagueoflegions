@@ -1,10 +1,14 @@
 package com.example.dennis.leagueoflegions;
 
 public class Army extends Unit {
-    private final static String TYPE = "army";
+    private static final UnitType UNIT_TYPE = UnitType.ARMY;
+    private static final int DEFAULT_SIZE = 5;
+    private static final int DEFAULT_SPEED = 5;
 
     public Army(Player player, int x, int y) {
         super(player, x, y);
+        setSize(DEFAULT_SIZE);
+        setSpeed(DEFAULT_SPEED);
     }
 
     @Override
@@ -13,8 +17,8 @@ public class Army extends Unit {
     }
 
     @Override
-    public String getType()
+    public UnitType getType()
     {
-        return TYPE;
+        return UNIT_TYPE;
     }
 }

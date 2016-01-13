@@ -1,16 +1,21 @@
 package com.example.dennis.leagueoflegions;
 
 public class Base extends Unit {
-    private static final String TYPE = "rectangle";
+    private static final UnitType UNIT_TYPE = UnitType.BASE;
+    private static final int DEFAULT_SIZE = 10;
+    private static final int DEFAULT_SPEED = 5;
 
-    public static final float SPAWN_TIME = 3.0f;
-    public static final int SPAWN_DISTANCE = 20;
+    private static final float DEFAULT_SPAWN_RATE = 3.0f;
 
+    private float spawnRate;
     private float lastSpawnTime;
 
     public Base(Player player, int x, int y) {
         super(player, x, y);
+        setSize(DEFAULT_SIZE);
+        setSpeed(DEFAULT_SPEED);
 
+        spawnRate = DEFAULT_SPAWN_RATE;
         lastSpawnTime = player.getGame().getTime();
     }
 
@@ -18,18 +23,25 @@ public class Base extends Unit {
     public void update() {
         super.update();
 
-        float updateTime = getPlayer().getGame().getTime();
-        if (updateTime - lastSpawnTime > SPAWN_TIME) {
+        float gameTime = getPlayer().getGame().getTime();
+        if (gameTime - lastSpawnTime > spawnRate) {
             Player selfPlayer = getPlayer();
-            int spawnX = getX() + (int)(2*(Math.random()-0.5)*2*SPAWN_DISTANCE);
-            int spawnY = getY() + (int)(2*(Math.random()-0.5)*2*SPAWN_DISTANCE);
-            selfPlayer.addUnit(new Army(selfPlayer, spawnX, spawnY));
-            lastSpawnTime = updateTime;
+            int xOffset = (int)((1+Math.random())*getSize());
+            if (Math.random() < 0.5) {
+                xOffset *= -1;
+            }
+            int yOffset = (int)((1+Math.random())*getSize());
+            if (Math.random() < 0.5) {
+                yOffset *= -1;
+            }
+            selfPlayer.addUnit(new Army(selfPlayer, getX() + xOffset, getY() + yOffset));
+            lastSpawnTime = gameTime;
         }
     }
 
-    public String getType()
+    @Override
+    public UnitType getType()
     {
-        return TYPE;
+        return UNIT_TYPE;
     }
 }

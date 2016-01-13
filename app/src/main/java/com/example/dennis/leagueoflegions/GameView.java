@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
+import android.graphics.PathMeasure;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -19,28 +19,31 @@ public class GameView extends SurfaceView implements Runnable {
     private static final boolean DEBBUGGING = true;
     private static final String[] DEBUG_TEXT = new String[]{"","","","",""};
 
-    private Game game;
-    private volatile boolean playing;
-    private Thread gameThread = null;
     private static final int FPS = 60;
+    private static final int TOUCH_MOVE_TOLERANCE = 5;
+    private static final int TOUCH_SELECT_TOLERANCE = 20;
 
-    private Paint debugPaint;
-    private Paint unitPaint;
-    private Canvas canvas;
+    // Game
+    private Game game;
+    private Thread gameThread;
+    private volatile boolean playing;
+
+    // Painting
     private SurfaceHolder surfaceHolder;
-
-    private Path path;
-    private Paint pathPaint;
+    private Canvas canvas;
+    private Paint debugPaint;
     private Paint mapPaint;
+    private Paint unitPaint;
+    private Paint pathPaint;
+
+    // Touch and Drawing
+    private Path path;
     private float pathX, pathY;
-    private boolean drawingPath;
-    private static final float TOUCH_TOLERANCE = 5;
     private Unit selectedUnit;
-    private static final int SELECT_TOLERANCE = 20;
+    private boolean drawing;
 
+    // Map
     private Map map;
-
-    // new variables added for tesing tiled images
     Bitmap mBitmap;
     BitmapDrawable mDrawable;
     private int numTimesDrawn;
@@ -48,20 +51,34 @@ public class GameView extends SurfaceView implements Runnable {
     public GameView(Context context, Game game, Map map){
         super(context);
 
-        surfaceHolder = getHolder();
+        // Game
         this.game = game;
-        path = new Path();
-        selectedUnit = null;
+        this.gameThread = null;
+        this.playing = false;
 
-        mapPaint = new Paint();
+        // Painting
+        this.surfaceHolder = getHolder();
+        this.canvas = null;
         debugPaint = new Paint();
+        debugPaint.setTextSize(20);
+        debugPaint.setTextAlign(Paint.Align.LEFT);
+        debugPaint.setColor(Color.BLACK);
+        mapPaint = new Paint();
         unitPaint = new Paint();
         pathPaint = new Paint();
         pathPaint.setStyle(Paint.Style.STROKE);
         pathPaint.setStrokeWidth(4f);
-        drawingPath = false;
 
+        // Touch and Drawing
+        path = new Path();
+        pathX = pathY = 0;
+        selectedUnit = null;
+        drawing = false;
+
+        // Map
         this.map = map;
+        mBitmap = null;
+        mDrawable = null;
         numTimesDrawn = 0;
     }
 
@@ -79,7 +96,7 @@ public class GameView extends SurfaceView implements Runnable {
         game.updateTime();
         DEBUG_TEXT[0] = game.getTime() + "";
 
-        ArrayList<Player> players = game.getPlayers();
+        ArrayList<Player> players = new ArrayList<Player>(game.getPlayers());   // make a copy
         for(Player p : players)
         {
             // WARNING: currently each players units can be changed
@@ -102,52 +119,35 @@ public class GameView extends SurfaceView implements Runnable {
             mapPaint.setColor(Color.WHITE);
             canvas.drawPaint(mapPaint);
 
-            // added in order to tile images to render the map
-
-            /*
-            for(int j = 0; j < canvas.getWidth(); j += 200)
-            {
-                for(int k = 0; k < canvas.getHeight(); k += 200)
-                {
-                    Rect rect = new Rect(j, k, j + 200, k + 200);
-                    mBitmap = map.loadImage();
-                    mDrawable = new BitmapDrawable(getResources(), mBitmap);
-                    //mDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-                    mDrawable.setBounds(rect);
-                    // testing code added for tiled images
-                    mDrawable.draw(canvas);
-                }
-            }
-            */
-
-            if(numTimesDrawn == 0)
-            {
-                map.setFinalImage();
-                numTimesDrawn++;
-            }
-
-            Rect rect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
-            mBitmap = map.getFinalImage();
-            mDrawable = new BitmapDrawable(getResources(), mBitmap);
-            mDrawable.setBounds(rect);
-            mDrawable.draw(canvas);
+//            if(numTimesDrawn == 0)
+//            {
+//                map.setFinalImage();
+//                numTimesDrawn++;
+//            }
+//
+//            Rect rect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
+//            mBitmap = map.getFinalImage();
+//            mDrawable = new BitmapDrawable(getResources(), mBitmap);
+//            mDrawable.setBounds(rect);
+//            mDrawable.draw(canvas);
 
             // Draw units
             ArrayList<Player> players = game.getPlayers();
             for(Player player : players) {
                 for(Unit unit : player.getUnits()) {
+                    int x = unit.getX();
+                    int y = unit.getY();
+                    int size = unit.getSize();
                     unitPaint.setColor(unit.getColor());
-                    if(unit.getType().equals("base")) {
-                        canvas.drawRect(unit.getRect(), unitPaint);
-                    } else if (unit.getType().equals("army")){
-                        int x = unit.getX();
-                        int y = unit.getY();
-
-                        for(int i = -10; i <= 10; i++) {
-                            for (int j = -10; j <= 10; j++) {
-                                canvas.drawCircle(x + 20*i, y + 20*j, 5, unitPaint);
-                            }
-                        }
+                    switch (unit.getType()) {
+                        case BASE:
+                            canvas.drawRect(x-size, y+size, x+size, y-size, unitPaint);
+                            break;
+                        case ARMY:
+                            canvas.drawCircle(x, y, size, unitPaint);
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown unit type.");
                     }
                     if (!unit.getPath().isEmpty()) {
                         pathPaint.setColor(unit.getColor());
@@ -158,10 +158,6 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             if (DEBBUGGING) {
-                // Debugging text
-                debugPaint.setTextSize(20);
-                debugPaint.setTextAlign(Paint.Align.LEFT);
-                debugPaint.setColor(Color.BLACK);
                 for(int i = 0; i < DEBUG_TEXT.length; i++) {
                     canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, debugPaint);
                 }
@@ -191,7 +187,6 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     // Make a new thread and start it
-    // Execution moves to our R
     public void resume() {
         playing = true;
         gameThread = new Thread(this);
@@ -209,41 +204,41 @@ public class GameView extends SurfaceView implements Runnable {
                 selectedUnit = null;
                 for (Player player : game.getPlayers()) {
                     for (Unit unit : player.getUnits()) {
-                        if (Math.abs(unit.getX() - x) < Unit.UNIT_SIZE + SELECT_TOLERANCE &&
-                                Math.abs(unit.getY() - y) < Unit.UNIT_SIZE + SELECT_TOLERANCE) {
+                        if (Math.abs(unit.getX() - x) < unit.getSize() + TOUCH_SELECT_TOLERANCE &&
+                                Math.abs(unit.getY() - y) < unit.getSize() + TOUCH_SELECT_TOLERANCE) {
                             selectedUnit = unit;
-                            drawingPath = true;
+                            drawing = true;
                         }
                     }
                 }
-                if (drawingPath) {
+                if (drawing) {
                     path.reset();
                     path.moveTo(selectedUnit.getX(), selectedUnit.getY());
+                    PathMeasure pm = new PathMeasure(path, false);
                     pathX = selectedUnit.getX();
                     pathY = selectedUnit.getY();
                     selectedUnit.setPath(path);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (drawingPath) {
-                    float dx = Math.abs(x - pathX);
-                    float dy = Math.abs(y - pathY);
-                    if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-                        path.quadTo(pathX, pathY, (x + pathX)/2, (y + pathY)/2);
+                if (drawing) {
+                    if (Math.abs(x - pathX) >= TOUCH_MOVE_TOLERANCE || Math.abs(y - pathY) >= TOUCH_MOVE_TOLERANCE) {
+                        path.quadTo(pathX, pathY, (x + pathX) / 2, (y + pathY) / 2);
                         pathX = x;
                         pathY = y;
+                        selectedUnit.updatePath(path);
                     }
-                    selectedUnit.updatePath(path);
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (drawingPath) {
+                if (drawing) {
                     path.lineTo(pathX, pathY);
                     selectedUnit.updatePath(path);
 
-                    selectedUnit = null;
-                    drawingPath = false;
                     path.reset();
+                    pathX = pathY = 0;
+                    selectedUnit = null;
+                    drawing = false;
                 }
                 break;
         }
