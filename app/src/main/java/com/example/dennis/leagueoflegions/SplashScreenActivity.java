@@ -19,13 +19,13 @@ public class SplashScreenActivity extends Activity {
 
         switch (view.getId()) {
             case R.id.button_campaign:
-                intent.putExtra(Game.GAME_MODE, "campaign");
+                intent.putExtra(Game.GAME_TYPE, Game.GameType.CAMPAIGN);
                 break;
             case R.id.button_multiplayer:
-                intent.putExtra(Game.GAME_MODE, "multiplayer");
+                intent.putExtra(Game.GAME_TYPE, Game.GameType.MULTIPLAYER);
                 break;
             case R.id.button_tutorial:
-                intent.putExtra(Game.GAME_MODE, "tutorial");
+                intent.putExtra(Game.GAME_TYPE, Game.GameType.TUTORIAL);
                 break;
         }
         startActivity(intent);

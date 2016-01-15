@@ -13,7 +13,8 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Bundle extras = getIntent().getExtras();
-        String game_mode = extras.getString(Game.GAME_MODE);
+//        String game_mode = extras.getString(Game.GAME_TYPE);
+        Game.GameType gameType = (Game.GameType) getIntent().getSerializableExtra(Game.GAME_TYPE);
 
         game = new Game();
         Map map = new Map(this);

@@ -37,6 +37,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private static final String TAG = "MyGLRenderer";
     private Triangle mTriangle;
     private Square mSquare;
+    private FreeformCircle mCircle;
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mMVPMatrix = new float[16];
@@ -54,6 +55,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         mTriangle = new Triangle();
         mSquare   = new Square();
+        float[] color = {1f, 0f, 0f, 1f};
+        mCircle   = new FreeformCircle(color);
     }
 
     @Override
@@ -70,7 +73,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
         // Draw square
-        mSquare.draw(mMVPMatrix);
+//        mSquare.draw(mMVPMatrix);
 
         // Create a rotation for the triangle
 
@@ -87,7 +90,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
 
         // Draw triangle
-        mTriangle.draw(scratch);
+        mCircle.update();
+        mCircle.draw(scratch);
     }
 
     @Override
