@@ -47,6 +47,11 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     private float mAngle;
 
+    private float viewportRatio;
+    private float viewX;
+    private float viewY;
+    private float projectionScale;
+
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
@@ -57,6 +62,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mSquare   = new Square();
         float[] color = {1f, 0f, 0f, 1f};
         mCircle   = new FreeformCircle(color);
+
+        viewX = 0f;
+        viewY = 0f;
+        projectionScale = 1f;
     }
 
     @Override
@@ -66,8 +75,14 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         // Draw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
+
+        // this projection matrix is applied to object coordinates
+        // in the onDrawFrame() method
+        Matrix.frustumM(mProjectionMatrix, 0, -viewportRatio, viewportRatio, -1, 1, projectionScale, 100);
+
         // Set the camera position (View matrix)
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -5, 0, 0, 0f, 0f, 1.0f, 0.0f);
+        Matrix.translateM(mViewMatrix, 0, viewX, viewY, 0f);
 
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
@@ -100,11 +115,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         // such as screen rotation
         GLES20.glViewport(0, 0, width, height);
 
-        float ratio = (float) width / height;
-
-        // this projection matrix is applied to object coordinates
-        // in the onDrawFrame() method
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+        viewportRatio = (float) width / height;
 
     }
 
@@ -167,4 +178,27 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mAngle = angle;
     }
 
+    public float getViewX() {
+        return viewX;
+    }
+
+    public void setViewX(float x) {
+        viewX = x;
+    }
+
+    public float getViewY() {
+        return viewY;
+    }
+
+    public void setViewY(float y) {
+        viewY = y;
+    }
+
+    public float getProjectionScale() {
+        return projectionScale;
+    }
+
+    public void setProjectionScale(float scale) {
+        projectionScale = scale;
+    }
 }

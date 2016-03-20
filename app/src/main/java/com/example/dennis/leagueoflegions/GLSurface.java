@@ -17,7 +17,10 @@ package com.example.dennis.leagueoflegions;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 
 /**
  * A view container where OpenGL ES graphics can be drawn on screen.
@@ -25,8 +28,11 @@ import android.view.MotionEvent;
  * interacting with drawn objects.
  */
 public class GLSurface extends GLSurfaceView {
+    private static final String DEBUG_TAG = "GLSurface";
 
     private final GLRenderer mRenderer;
+    private GestureDetector mGestureDetector;
+    private ScaleGestureDetector mScaleGestureDetector;
 
     public GLSurface(Context context) {
         super(context);
@@ -40,6 +46,32 @@ public class GLSurface extends GLSurfaceView {
 
         // Render the view only when there is a change in the drawing data
 //        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                    float distanceX, float distanceY) {
+                mRenderer.setViewX(mRenderer.getViewX() + distanceX / 100);
+                mRenderer.setViewY(mRenderer.getViewY() + distanceY / 100);
+                Log.d(DEBUG_TAG, "onScroll: (" + mRenderer.getViewX() + ", " + mRenderer.getViewY() + ")");
+
+                requestRender();
+                return true;
+            }
+        });
+
+        mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                float mScaleFactor = mRenderer.getProjectionScale() * detector.getScaleFactor();
+                mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
+                mRenderer.setProjectionScale(mScaleFactor);
+                Log.d(DEBUG_TAG, "onScale: " + mRenderer.getProjectionScale());
+
+                requestRender();
+                return true;
+            }
+        });
     }
 
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
@@ -51,6 +83,10 @@ public class GLSurface extends GLSurfaceView {
         // MotionEvent reports input details from the touch screen
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
+
+        mScaleGestureDetector.onTouchEvent(e);
+        mGestureDetector.onTouchEvent(e);
+
 
         float x = e.getX();
         float y = e.getY();
@@ -74,6 +110,7 @@ public class GLSurface extends GLSurfaceView {
                 mRenderer.setAngle(
                         mRenderer.getAngle() +
                                 ((dx + dy) * TOUCH_SCALE_FACTOR));  // = 180.0f / 320
+                Log.d(DEBUG_TAG, "onTouchEvent: " + mRenderer.getAngle());
                 requestRender();
         }
 
