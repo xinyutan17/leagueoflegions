@@ -1,4 +1,4 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.view.SurfaceView;
+
+import com.example.dennis.leagueoflegions.R;
 
 import java.util.ArrayList;
 

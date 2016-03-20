@@ -1,9 +1,12 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.view;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
+import com.example.dennis.leagueoflegions.R;
+import com.example.dennis.leagueoflegions.model.Game;
 
 public class SplashScreenActivity extends Activity {
 

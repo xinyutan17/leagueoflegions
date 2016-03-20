@@ -1,9 +1,9 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.model;
 
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 
-public abstract class Unit {
+public abstract class Unit extends GameObject {
     public enum UnitType {BASE, ARMY}
 
     // Unit

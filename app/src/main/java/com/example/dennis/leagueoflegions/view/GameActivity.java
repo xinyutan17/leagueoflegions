@@ -1,7 +1,10 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.view;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.example.dennis.leagueoflegions.model.Game;
+import com.example.dennis.leagueoflegions.model.Map;
 
 public class GameActivity extends Activity {
 

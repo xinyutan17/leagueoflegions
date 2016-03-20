@@ -1,4 +1,7 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.model.unit;
+
+import com.example.dennis.leagueoflegions.model.Player;
+import com.example.dennis.leagueoflegions.model.Unit;
 
 public class Base extends Unit {
     private static final UnitType UNIT_TYPE = UnitType.BASE;

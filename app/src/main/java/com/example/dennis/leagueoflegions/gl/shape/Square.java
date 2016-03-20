@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.gl.shape;
 
 import android.opengl.GLES20;
+
+import com.example.dennis.leagueoflegions.view.GLRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

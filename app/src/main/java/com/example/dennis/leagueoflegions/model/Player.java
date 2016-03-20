@@ -1,4 +1,4 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.model;
 
 import java.util.ArrayList;
 

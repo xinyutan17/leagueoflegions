@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.view;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
+
+import com.example.dennis.leagueoflegions.gl.unit.GLArmy;
+import com.example.dennis.leagueoflegions.gl.shape.Square;
+import com.example.dennis.leagueoflegions.gl.shape.Triangle;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -37,7 +41,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private static final String TAG = "MyGLRenderer";
     private Triangle mTriangle;
     private Square mSquare;
-    private FreeformCircle mCircle;
+    private GLArmy mCircle;
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mMVPMatrix = new float[16];
@@ -61,7 +65,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mTriangle = new Triangle();
         mSquare   = new Square();
         float[] color = {1f, 0f, 0f, 1f};
-        mCircle   = new FreeformCircle(color);
+        mCircle   = new GLArmy(color);
 
         viewX = 0f;
         viewY = 0f;

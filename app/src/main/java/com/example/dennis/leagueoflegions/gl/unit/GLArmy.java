@@ -1,13 +1,15 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.gl.unit;
 
 import android.opengl.GLES20;
+
+import com.example.dennis.leagueoflegions.view.GLRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-public class FreeformCircle {
+public class GLArmy {
 
     private final String vertexShaderCode =
             "uniform mat4 uMVPMatrix;" +
@@ -50,7 +52,7 @@ public class FreeformCircle {
     private float[] radiiStepDir;       // the direction of the radius step at each update
     private float[] vertices;           // the vertices
 
-    public FreeformCircle(float[] color) {
+    public GLArmy(float[] color) {
         this.color = color;
 
         drawOrder = new short[TOTAL_NUMBER_OF_VERTICES];

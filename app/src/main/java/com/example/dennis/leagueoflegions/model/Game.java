@@ -1,6 +1,8 @@
-package com.example.dennis.leagueoflegions;
+package com.example.dennis.leagueoflegions.model;
 
 import android.graphics.Color;
+
+import com.example.dennis.leagueoflegions.model.unit.Base;
 
 import java.util.ArrayList;
 
