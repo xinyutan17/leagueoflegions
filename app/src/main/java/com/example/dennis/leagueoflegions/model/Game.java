@@ -31,6 +31,8 @@ public class Game {
         startTime = System.currentTimeMillis();
         gameTime = 0f;
         elapsedTime = 0f;
+
+        map = new Map();
     }
 
     public ArrayList<Player> getPlayers()

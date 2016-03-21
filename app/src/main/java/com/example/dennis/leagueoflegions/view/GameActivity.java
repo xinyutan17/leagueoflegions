@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.example.dennis.leagueoflegions.model.Game;
-import com.example.dennis.leagueoflegions.model.Map;
 
 public class GameActivity extends Activity {
 
@@ -20,21 +19,20 @@ public class GameActivity extends Activity {
         Game.GameType gameType = (Game.GameType) getIntent().getSerializableExtra(Game.GAME_TYPE);
 
         game = new Game();
-        Map map = new Map(this);
-        gameView = new GameView(this, game, map);
+        gameView = new GameView(this, game);
         setContentView(gameView);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        gameView.pause();
+//        gameView.pause();
     }
 
     // If the Activity is resumed make sure to resume our thread
     @Override
     protected void onResume() {
         super.onResume();
-        gameView.resume();
+//        gameView.resume();
     }
 }

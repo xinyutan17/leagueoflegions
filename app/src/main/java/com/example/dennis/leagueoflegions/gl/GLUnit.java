@@ -1,7 +1,9 @@
 package com.example.dennis.leagueoflegions.gl;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
+import com.example.dennis.leagueoflegions.model.Unit;
 import com.example.dennis.leagueoflegions.view.GLRenderer;
 
 import java.nio.ByteBuffer;
@@ -14,6 +16,12 @@ public abstract class GLUnit {
     private static final int BYTES_PER_FLOAT = 4;
     private static final int COORDS_PER_VERTEX = 3;                                 // the number of coordinates per vertex
     private static final int VERTEX_STRIDE = COORDS_PER_VERTEX * BYTES_PER_FLOAT;   // the number of bytes per vertex
+
+    final float[] mMVPMatrix = new float[16];
+    final float[] mModelMatrix = new float[16];
+    final float[] mTranslationMatrix = new float[16];
+    final float[] mRotationMatrix = new float[16];
+    final float[] mScaleMatrix = new float[16];
 
     private int mProgram;
     private int mPositionHandle;
@@ -72,7 +80,33 @@ public abstract class GLUnit {
         drawOrderBuffer.position(0);
     }
 
-    public void draw(float[] mvpMatrix) {
+    public void draw(float[] vpMatrix, Unit unit) {
+        float x = (float) unit.getX();
+        float y = (float) unit.getY();
+        float size = (float) unit.getSize();
+
+        float[] scratch = new float[16];
+
+        for (int i = 0; i < scratch.length; i++) {
+            scratch[i] = 0f;
+        }
+        Matrix.translateM(mTranslationMatrix, 0, scratch, 0, x, y, 0f);
+
+        Matrix.setIdentityM(scratch, 0);
+        Matrix.scaleM(mScaleMatrix, 0, scratch, 0, size, size, 1f);
+
+        Matrix.setIdentityM(mRotationMatrix, 0);
+
+
+        Matrix.multiplyMM(mModelMatrix, 0, mTranslationMatrix, 0, mRotationMatrix, 0);
+        Matrix.multiplyMM(mModelMatrix, 0, mModelMatrix, 0, mScaleMatrix, 0);
+
+        Matrix.multiplyMM(mMVPMatrix, 0, vpMatrix, 0, mModelMatrix, 0);
+
+        /**
+         * TODO: draw unit color + unit path
+         */
+
         GLES20.glUseProgram(mProgram);
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
@@ -84,7 +118,7 @@ public abstract class GLUnit {
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         GLRenderer.checkGlError("glGetUniformLocation");
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLRenderer.checkGlError("glUniformMatrix4fv");
 
         GLES20.glDrawElements(GLES20.GL_TRIANGLE_FAN, drawOrder.length, GLES20.GL_UNSIGNED_SHORT, drawOrderBuffer);

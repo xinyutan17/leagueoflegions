@@ -133,4 +133,8 @@ public abstract class Unit extends GameObject {
     public void setSpeed(float speed) {
         this.speed = speed;
     }
+
+    public void draw(float[] vpMatrix) {
+
+    }
 }

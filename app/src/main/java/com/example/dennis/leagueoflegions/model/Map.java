@@ -1,18 +1,11 @@
 package com.example.dennis.leagueoflegions.model;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.view.SurfaceView;
 
-import com.example.dennis.leagueoflegions.R;
-
-import java.util.ArrayList;
-
-public class Map extends SurfaceView
+public class Map
 {
     private Bitmap finalImage;
     public static final int mapWidth = 50;
@@ -23,9 +16,8 @@ public class Map extends SurfaceView
         CLIFF, DESERT, FOREST, GROUND, ICE, JUNGLE, MOUNTAIN, SWAMP, WALL, WATER
     }
 
-    public Map(Context context)
+    public Map()
     {
-        super(context);
         map = new TerrainType[mapWidth][mapHeight];
     }
 
@@ -170,7 +162,7 @@ public class Map extends SurfaceView
     }
 
     private Bitmap getImage(TerrainType terrain) {
-
+        /** TODO: load resources outside of Map
         Bitmap bm = null;
         switch (terrain){
             case CLIFF:
@@ -205,5 +197,7 @@ public class Map extends SurfaceView
                 break;
         }
         return bm;
+         **/
+        return null;
     }
 }
