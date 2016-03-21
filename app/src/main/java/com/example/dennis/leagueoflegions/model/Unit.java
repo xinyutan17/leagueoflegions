@@ -66,6 +66,16 @@ public abstract class Unit extends GameObject {
         this.size = size;
     }
 
+    @Override
+    public float getScale() {
+        return getSize();
+    }
+
+    @Override
+    public void setScale(float scale) {
+        // do nothing
+    }
+
     public float getSpeed() {
         return speed;
     }

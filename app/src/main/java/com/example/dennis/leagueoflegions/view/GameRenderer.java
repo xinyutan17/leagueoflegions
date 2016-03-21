@@ -112,6 +112,10 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public void tick() {
         game.tick();
 
+        for (GLUnit glUnit : glUnits) {
+            glUnit.tick();
+        }
+
         addAllGLUnits(game.getUnitAddQueue());
         for (GLUnit glUnit : glUnits) {
             if (game.getUnitRemoveQueue().contains(glUnit.getGameObject())) {

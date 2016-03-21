@@ -29,14 +29,10 @@ public class Base extends Unit {
         float gameTime = getPlayer().getGame().getTime();
         if (gameTime - lastSpawnTime > spawnRate) {
             Player selfPlayer = getPlayer();
-            int xOffset = (int)((1+Math.random())*getSize());
-            if (Math.random() < 0.5) {
-                xOffset *= -1;
-            }
-            int yOffset = (int)((1+Math.random())*getSize());
-            if (Math.random() < 0.5) {
-                yOffset *= -1;
-            }
+            double radius = 2*(1 + Math.random()) * getSize();
+            double angle = Math.random() * 2*Math.PI;
+            float xOffset = (float)(radius * Math.cos(angle));
+            float yOffset = (float)(radius * Math.sin(angle));
             selfPlayer.addUnit(new Army(selfPlayer, getX() + xOffset, getY() + yOffset));
             lastSpawnTime = gameTime;
         }

@@ -3,7 +3,7 @@ package com.example.dennis.leagueoflegions.gl.shape;
 import android.opengl.GLES20;
 
 public class Circle extends Shape {
-    public static final int NUMBER_VERTICES = 20;                          // the number of vertices used to represent the circle
+    public static final int NUMBER_VERTICES = 50;                          // the number of vertices used to represent the circle
     public static final int TOTAL_VERTICES = NUMBER_VERTICES + 2;          // the number of vertices used to draw the circle
     public static final double DELTA_ANGLE = 2*Math.PI/NUMBER_VERTICES;    // the angle of the circle that each triangle fills
 
