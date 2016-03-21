@@ -13,7 +13,7 @@ public class Base extends Unit {
     private float spawnRate;
     private float lastSpawnTime;
 
-    public Base(Player player, int x, int y) {
+    public Base(Player player, float x, float y) {
         super(player, x, y);
         setSize(DEFAULT_SIZE);
         setSpeed(DEFAULT_SPEED);
@@ -23,8 +23,8 @@ public class Base extends Unit {
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void tick() {
+        super.tick();
 
         float gameTime = getPlayer().getGame().getTime();
         if (gameTime - lastSpawnTime > spawnRate) {

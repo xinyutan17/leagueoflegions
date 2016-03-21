@@ -6,9 +6,9 @@ public class Player {
 
     private Game game;
     private ArrayList<Unit> units;
-    private int color;
+    private float[] color;
 
-    public Player(Game game, int color)
+    public Player(Game game, float[] color)
     {
         this.game = game;
         units = new ArrayList<>();
@@ -26,7 +26,7 @@ public class Player {
         return units;
     }
 
-    public int getColor() {
+    public float[] getColor() {
         return color;
     }
 
