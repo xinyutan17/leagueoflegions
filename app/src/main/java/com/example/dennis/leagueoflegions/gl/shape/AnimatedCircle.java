@@ -44,6 +44,6 @@ public class AnimatedCircle extends Circle {
         vertices[3*(NUMBER_VERTICES+1)+0] = vertices[3*(0+1)+0];
         vertices[3*(NUMBER_VERTICES+1)+1] = vertices[3*(0+1)+1];
         setRadii(radii);
-        setVertices(vertices);
+        resetVertices(vertices);
     }
 }

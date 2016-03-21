@@ -1,6 +1,7 @@
 package com.example.dennis.leagueoflegions.gl.shape;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.example.dennis.leagueoflegions.gl.GLUtility;
 
@@ -32,18 +33,17 @@ public abstract class Shape {
 
     public Shape(float[] vertices, short[] drawOrder, int GL_DRAW_TYPE, float[] color) {
         createProgram();
-
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * BYTES_PER_FLOAT);
-        bb.order(ByteOrder.nativeOrder());
-        verticesBuffer = bb.asFloatBuffer();
         setVertices(vertices);
-
-        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * BYTES_PER_SHORT);
-        dlb.order(ByteOrder.nativeOrder());
-        drawOrderBuffer = dlb.asShortBuffer();
         setDrawOrder(drawOrder);
-
         setGL_DRAW_TYPE(GL_DRAW_TYPE);
+        setColor(color);
+    }
+
+    public Shape(float[] color) {
+        createProgram();
+        vertices = null;
+        drawOrder = null;
+        GL_DRAW_TYPE = -1;
         setColor(color);
     }
 
@@ -79,6 +79,19 @@ public abstract class Shape {
 
     public void setVertices(float[] vertices) {
         this.vertices = vertices;
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * BYTES_PER_FLOAT);
+        bb.order(ByteOrder.nativeOrder());
+        verticesBuffer = bb.asFloatBuffer();
+        verticesBuffer.put(vertices);
+        verticesBuffer.position(0);
+    }
+
+    public void resetVertices(float[] vertices) {
+        if (vertices.length != this.vertices.length) {
+            setVertices(vertices);
+            return;
+        }
+        this.vertices = vertices;
         verticesBuffer.clear();
         verticesBuffer.put(vertices);
         verticesBuffer.position(0);
@@ -88,19 +101,32 @@ public abstract class Shape {
         return drawOrder;
     }
 
+    public void setDrawOrder(short[] drawOrder) {
+        this.drawOrder = drawOrder;
+        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * BYTES_PER_SHORT);
+        dlb.order(ByteOrder.nativeOrder());
+        drawOrderBuffer = dlb.asShortBuffer();
+        drawOrderBuffer.put(drawOrder);
+        drawOrderBuffer.position(0);
+    }
+
+    public void resetDrawOrder(short[] drawOrder) {
+        if (drawOrder.length != this.drawOrder.length) {
+            setDrawOrder(drawOrder);
+            return;
+        }
+        this.drawOrder = drawOrder;
+        drawOrderBuffer.clear();
+        drawOrderBuffer.put(drawOrder);
+        drawOrderBuffer.position(0);
+    }
+
     public int getGL_DRAW_TYPE() {
         return GL_DRAW_TYPE;
     }
 
     public void setGL_DRAW_TYPE(int GL_DRAW_TYPE) {
         this.GL_DRAW_TYPE = GL_DRAW_TYPE;
-    }
-
-    public void setDrawOrder(short[] drawOrder) {
-        this.drawOrder = drawOrder;
-        drawOrderBuffer.clear();
-        drawOrderBuffer.put(drawOrder);
-        drawOrderBuffer.position(0);
     }
 
     public float[] getColor() {
@@ -112,6 +138,11 @@ public abstract class Shape {
     }
 
     public void draw(float[] mMVPMatrix) {
+        if (vertices == null || drawOrder == null || GL_DRAW_TYPE == -1) {
+            Log.e(DEBUG_TAG, "failed to draw shape: null vertices, drawOrder, or GL_DRAW_TYPE");
+            return;
+        }
+
         GLES20.glUseProgram(mProgram);
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");

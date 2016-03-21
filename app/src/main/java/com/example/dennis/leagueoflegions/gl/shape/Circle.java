@@ -10,7 +10,7 @@ public class Circle extends Shape {
     private float[] radii;              // the radii for the vertices
 
     public Circle(float[] color) {
-        super(null, null, GLES20.GL_TRIANGLE_FAN, color);
+        super(color);
 
         radii = new float[NUMBER_VERTICES];
         float[] vertices = new float[COORDS_PER_VERTEX * TOTAL_VERTICES];
@@ -31,6 +31,8 @@ public class Circle extends Shape {
             drawOrder[i] = i;
         }
         setDrawOrder(drawOrder);
+
+        setGL_DRAW_TYPE(GLES20.GL_TRIANGLE_FAN);
     }
 
     public float[] getRadii() {

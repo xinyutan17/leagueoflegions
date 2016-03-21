@@ -41,35 +41,6 @@ public abstract class Unit extends GameObject {
         this.remainingPath = new Path();
     }
 
-    @Override
-    public void tick(){
-        if (!path.isEmpty()) {
-            pathDist += speed;
-            if (pathDist > pm.getLength()) {
-                pathDist = pm.getLength();
-            }
-            float[] pathXY = new float[2];
-            pm.getPosTan(pathDist, pathXY, null);
-
-            float x = getX();
-            float y = getY();
-            float dx = (int)(pathXY[0] - x);
-            float dy = (int)(pathXY[1] - y);
-            setX(x + dx);
-            setY(y + dy);
-
-            remainingPath.reset();
-            pm.getSegment(pathDist, pm.getLength(), remainingPath, true);
-
-            if (pathDist == pm.getLength()) {
-                path.reset();
-                remainingPath.reset();
-                pm.setPath(null, false);
-                pathDist = 0;
-            }
-        }
-    }
-
     // Unit
     public Player getPlayer() {
         return player;
@@ -127,6 +98,35 @@ public abstract class Unit extends GameObject {
         pm.setPath(path, false);
         // path is being lengthened:
         // don't change pathDist or remainingPath
+    }
+
+    @Override
+    public void tick(){
+        if (!path.isEmpty()) {
+            pathDist += speed;
+            if (pathDist > pm.getLength()) {
+                pathDist = pm.getLength();
+            }
+            float[] pathXY = new float[2];
+            pm.getPosTan(pathDist, pathXY, null);
+
+            float x = getX();
+            float y = getY();
+            float dx = (int)(pathXY[0] - x);
+            float dy = (int)(pathXY[1] - y);
+            setX(x + dx);
+            setY(y + dy);
+
+            remainingPath.reset();
+            pm.getSegment(pathDist, pm.getLength(), remainingPath, true);
+
+            if (pathDist == pm.getLength()) {
+                path.reset();
+                remainingPath.reset();
+                pm.setPath(null, false);
+                pathDist = 0;
+            }
+        }
     }
 
     // Abstract

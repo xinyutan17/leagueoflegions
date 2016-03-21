@@ -68,9 +68,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public GameRenderer(Game game) {
         this.game = game;
         glUnits = new ArrayList<GLUnit>();
+        glUnitRemoveQueue = new ArrayList<GLUnit>();
         glTerrains = new ArrayList<GLTerrain>();
 
-        mLastTime = System.currentTimeMillis();
     }
 
     @Override
@@ -82,7 +82,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         viewY = 0f;
         projectionScale = 1f;
 
-        addAllGLUnits(game.getUnits());
+        mLastTime = System.currentTimeMillis();
+
+        tick(); // Set up initial units
     }
 
     @Override
@@ -143,12 +145,12 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             glUnit.draw(mVPMatrix);
         }
 
-        DEBUG_TEXT[0] = game.getTime() + "";
         /**
          if (DEBBUGGING) {
-             for(int i = 0; i < DEBUG_TEXT.length; i++) {
-                canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, debugPaint);
-             }
+            DEBUG_TEXT[0] = game.getTime() + "";
+            for(int i = 0; i < DEBUG_TEXT.length; i++) {
+            canvas.drawText(DEBUG_TEXT[i], 10, 60+20*i, debugPaint);
+            }
          }
          */
     }

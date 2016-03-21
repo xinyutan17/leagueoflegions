@@ -21,6 +21,7 @@ public class Game {
     public Game(){
         map = new Map();
         players = new ArrayList<Player>();
+        units = new ArrayList<Unit>();
         unitAddQueue = new ArrayList<Unit>();
         unitRemoveQueue = new ArrayList<Unit>();
 

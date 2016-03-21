@@ -27,7 +27,7 @@ public class Player {
     {
         unit.setColor(color);
         units.add(unit);
-        game.addUnit(unit);
+        game.addUnitAddQueue(unit);
     }
 
     public ArrayList<Unit> getUnits()
