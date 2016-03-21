@@ -1,9 +1,9 @@
 package com.example.dennis.leagueoflegions.gl;
 
-import com.example.dennis.leagueoflegions.model.GameObject;
+import com.example.dennis.leagueoflegions.model.Unit;
 
 public abstract class GLUnit extends GLObject {
-    public GLUnit(GameObject gameObject) {
-        super(gameObject);
+    public GLUnit(Unit unit) {
+        super(unit);
     }
 }

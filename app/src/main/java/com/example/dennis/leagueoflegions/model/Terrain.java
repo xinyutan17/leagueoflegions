@@ -1,7 +1,7 @@
 package com.example.dennis.leagueoflegions.model;
 
-/**
- * Created by Dennis on 3/20/2016.
- */
 public abstract class Terrain extends GameObject {
+    public Terrain(float x, float y, float scale, float rotation) {
+        super(x, y, scale, rotation);
+    }
 }

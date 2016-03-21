@@ -9,7 +9,6 @@ public abstract class Unit extends GameObject {
     // Unit
     private Player player;  // the player that owns this unit
     private float[] color;  // this unit's color
-    private float x, y;     // the (x, y) coordinate of this unit
     private float size;     // this unit's size (i.e. how "powerful" it is)
     private float speed;    // the speed with which to follow the path
 
@@ -22,24 +21,24 @@ public abstract class Unit extends GameObject {
     private float pathDist;     // path distance traveled (0 to 1 representing fraction of path traveled)
     private Path remainingPath; // this unit's remaining path
 
-    public Unit(Player player, float x, float y)
+    public Unit(Player player, float x, float y, float scale, float rotation, float size, float speed)
     {
+        super(x, y, scale, rotation);
+
         // Unit
         this.player = player;
         this.color = player.getColor();
-        this.x = x;
-        this.y = y;
-        this.size = 1f;
-        this.speed = 0.1f;
+        this.size = size;
+        this.speed = speed;
+
+        // Modifiers
+        // TODO
 
         // Path
         this.path = new Path();
         this.pm = new PathMeasure();
-        this.pathDist = 0;
+        this.pathDist = 0f;
         this.remainingPath = new Path();
-
-        // Modifiers
-        // TODO
     }
 
     @Override
@@ -51,10 +50,13 @@ public abstract class Unit extends GameObject {
             }
             float[] pathXY = new float[2];
             pm.getPosTan(pathDist, pathXY, null);
+
+            float x = getX();
+            float y = getY();
             float dx = (int)(pathXY[0] - x);
             float dy = (int)(pathXY[1] - y);
-            x += dx;
-            y += dy;
+            setX(x + dx);
+            setY(y + dy);
 
             remainingPath.reset();
             pm.getSegment(pathDist, pm.getLength(), remainingPath, true);
@@ -69,13 +71,14 @@ public abstract class Unit extends GameObject {
     }
 
     // Unit
-    public abstract UnitType getType();
-
     public Player getPlayer() {
         return player;
     }
 
-    @Override
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public float[] getColor() {
         return color;
     }
@@ -84,15 +87,24 @@ public abstract class Unit extends GameObject {
         this.color = color;
     }
 
-    @Override
-    public float getX(){
-        return x;
+    public float getSize() {
+        return size;
     }
 
-    @Override
-    public float getY(){
-        return y;
+    public void setSize(float size) {
+        this.size = size;
     }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    // Modifiers
+    // TODO
 
     // Path
     public Path getPath() {
@@ -117,21 +129,6 @@ public abstract class Unit extends GameObject {
         // don't change pathDist or remainingPath
     }
 
-    // Attributes
-    @Override
-    public float getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public float getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(float speed) {
-        this.speed = speed;
-    }
+    // Abstract
+    public abstract UnitType getType();
 }

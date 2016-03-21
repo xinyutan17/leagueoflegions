@@ -1,37 +1,50 @@
 package com.example.dennis.leagueoflegions.model;
 
-import com.example.dennis.leagueoflegions.gl.GLObject;
-
-/**
- * Created by Dennis on 3/20/2016.
- */
 public abstract class GameObject {
     private static final String DEBUG_TAG = "GameObject";
 
-    private GLObject glObject;
-    public GameObject() {
-        glObject = null;
+    private float x, y;
+    private float scale;
+    private float rotation;
+
+    public GameObject(float x, float y, float scale, float rotation) {
+        this.x = x;
+        this.y = y;
+        this.scale = scale;
+        this.rotation = rotation;
     }
 
-    public GLObject getGLObject() {
-        return glObject;
+    public float getX() {
+        return x;
     }
 
-    public void setGlObject(GLObject glObject) {
-        this.glObject = glObject;
+    public void setX(float x) {
+        this.x = x;
     }
 
-    public void draw(float[] mVPMatrix) {
-        glObject.draw(mVPMatrix);
+    public float getY() {
+        return y;
     }
 
-    public void tick() {
-        glObject.tick();
+    public void setY(float y) {
+        this.y = y;
     }
 
-    public abstract float getX();
-    public abstract float getY();
-    public abstract float getSize();
-    public abstract float[] getColor();
-    public abstract void instantiateGLObject();
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
+    public float getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
+    public abstract void tick();
 }

@@ -2,15 +2,15 @@ package com.example.dennis.leagueoflegions.gl.unit;
 
 import com.example.dennis.leagueoflegions.gl.GLUnit;
 import com.example.dennis.leagueoflegions.gl.shape.Square;
-import com.example.dennis.leagueoflegions.model.GameObject;
+import com.example.dennis.leagueoflegions.model.unit.Base;
 
 public class GLBase extends GLUnit {
 
     private Square square;
 
-    public GLBase(GameObject gameObject) {
-        super(gameObject);
-        square = new Square(gameObject.getColor());
+    public GLBase(Base base) {
+        super(base);
+        square = new Square(base.getColor());
     }
 
     @Override

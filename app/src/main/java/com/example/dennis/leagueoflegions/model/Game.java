@@ -10,18 +10,28 @@ public class Game {
 
     private Map map;
     private ArrayList<Player> players;
+    private ArrayList<Unit> units;
+    private ArrayList<Unit> unitAddQueue;
+    private ArrayList<Unit> unitRemoveQueue;
 
     private long startTime;     // start time (milliseconds)
     private float gameTime;     // game time (seconds)
     private float elapsedTime;  // elapsed time since last update (seconds)
 
     public Game(){
-        players = new ArrayList<Player>();
         map = new Map();
+        players = new ArrayList<Player>();
+        unitAddQueue = new ArrayList<Unit>();
+        unitRemoveQueue = new ArrayList<Unit>();
 
         startTime = System.currentTimeMillis();
         gameTime = 0f;
         elapsedTime = 0f;
+    }
+
+    public ArrayList<Player> getPlayers()
+    {
+        return players;
     }
 
     public void addPlayer(float[] color, float baseX, float baseY) {
@@ -30,15 +40,28 @@ public class Game {
         players.add(player);
     }
 
-    public ArrayList<Player> getPlayers()
-    {
-        return players;
+    public ArrayList<Unit> getUnits() {
+        return units;
     }
 
-    public void updateTime() {
-        float prevGameTime = gameTime;
-        gameTime = (System.currentTimeMillis() - startTime)/1000f;
-        elapsedTime = gameTime - prevGameTime;
+    public void addUnit(Unit unit) {
+        units.add(unit);
+    }
+
+    public ArrayList<Unit> getUnitAddQueue() {
+        return unitAddQueue;
+    }
+
+    public void addUnitAddQueue(Unit unit) {
+        unitAddQueue.add(unit);
+    }
+
+    public ArrayList<Unit> getUnitRemoveQueue() {
+        return unitRemoveQueue;
+    }
+
+    public void addUnitRemoveQueue(Unit unit) {
+        unitRemoveQueue.add(unit);
     }
 
     public float getTime() {
@@ -50,6 +73,21 @@ public class Game {
     }
 
     public void tick() {
+        float prevGameTime = gameTime;
+        gameTime = (System.currentTimeMillis() - startTime)/1000f;
+        elapsedTime = gameTime - prevGameTime;
 
+        for(Unit unit : units) {
+            unit.tick();
+        }
+
+        units.addAll(unitAddQueue);
+        units.removeAll(unitRemoveQueue);
+    }
+
+    public void tickCleanUp() {
+        // This should be called immediately after tick
+        unitAddQueue.clear();
+        unitRemoveQueue.clear();
     }
 }

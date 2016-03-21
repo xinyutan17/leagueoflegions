@@ -3,9 +3,6 @@ package com.example.dennis.leagueoflegions.gl;
 import android.opengl.GLES20;
 import android.util.Log;
 
-/**
- * Created by Dennis on 3/20/2016.
- */
 public class GLUtility {
     private static final String DEBUG_TAG = "GLUtility";
 

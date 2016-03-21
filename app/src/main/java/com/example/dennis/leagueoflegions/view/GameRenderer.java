@@ -18,10 +18,16 @@ package com.example.dennis.leagueoflegions.view;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.util.Log;
 
+import com.example.dennis.leagueoflegions.gl.GLTerrain;
+import com.example.dennis.leagueoflegions.gl.GLUnit;
+import com.example.dennis.leagueoflegions.gl.unit.GLArmy;
+import com.example.dennis.leagueoflegions.gl.unit.GLBase;
 import com.example.dennis.leagueoflegions.model.Game;
-import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
+import com.example.dennis.leagueoflegions.model.unit.Army;
+import com.example.dennis.leagueoflegions.model.unit.Base;
 
 import java.util.ArrayList;
 
@@ -53,10 +59,17 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private float projectionScale;
 
     private Game game;
+    private ArrayList<GLUnit> glUnits;
+    private ArrayList<GLUnit> glUnitRemoveQueue;
+    private ArrayList<GLTerrain> glTerrains;
+
     private long mLastTime;
 
     public GameRenderer(Game game) {
         this.game = game;
+        glUnits = new ArrayList<GLUnit>();
+        glTerrains = new ArrayList<GLTerrain>();
+
         mLastTime = System.currentTimeMillis();
     }
 
@@ -69,11 +82,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         viewY = 0f;
         projectionScale = 1f;
 
-        for(Player player : game.getPlayers()) {
-            for(Unit unit : player.getUnits()) {
-                unit.instantiateGLObject();
-            }
-        }
+        addAllGLUnits(game.getUnits());
     }
 
     @Override
@@ -92,55 +101,49 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             return;
         }
 
-        update();
+        tick();
         draw();
 
         mLastTime = now;
     }
 
-    private void update(){
-        game.updateTime();
-        DEBUG_TEXT[0] = game.getTime() + "";
-        /*
-        ArrayList<Player> players = new ArrayList<Player>(game.getPlayers());   // make a copy
-        for(Player p : players)
-        {
-            // WARNING: currently each players units can be changed
-            // while iterating through this units (e.g. base spawns new armies)
-            // Make sure each unit gets properly updated
-            ArrayList<Unit> units = p.getUnits();
-            for(int i = 0; i < units.size(); i++)
-            {
-                units.get(i).tick();
+    public void tick() {
+        game.tick();
+
+        addAllGLUnits(game.getUnitAddQueue());
+        for (GLUnit glUnit : glUnits) {
+            if (game.getUnitRemoveQueue().contains(glUnit.getGameObject())) {
+                glUnitRemoveQueue.add(glUnit);
             }
         }
-        */
+        glUnits.removeAll(glUnitRemoveQueue);
+        glUnitRemoveQueue.clear();
+
+        game.tickCleanUp();
     }
 
-    private void draw()
-    {
-        // Clear background
+    private void draw() {
+        // Setup view-projection matrix
+        Matrix.frustumM(mProjectionMatrix, 0, -viewportRatio, viewportRatio, -1, 1, projectionScale, 1000);
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -100, 0, 0, 0f, 0f, 1.0f, 0.0f);
+        Matrix.translateM(mViewMatrix, 0, viewX, viewY, 0f);
+        Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+
+        // Draw background
         GLES20.glClearColor(1f, 1f, 1f, 1f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // Setup projection matrix
-        Matrix.frustumM(mProjectionMatrix, 0, -viewportRatio, viewportRatio, -1, 1, projectionScale, 1000);
-
-        // Setup view matrix
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -100, 0, 0, 0f, 0f, 1.0f, 0.0f);
-        Matrix.translateM(mViewMatrix, 0, viewX, viewY, 0f);
-
-        // Combine view and project matrices
-        Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
-
-        // Draw units
-        ArrayList<Player> players = game.getPlayers();
-        for(Player player : players) {
-            for(Unit unit : player.getUnits()) {
-                unit.draw(mVPMatrix);
-            }
+        // Draw Terrains
+        for(GLTerrain glTerrain : glTerrains) {
+            glTerrain.draw(mVPMatrix);
         }
 
+        // Draw Units
+        for (GLUnit glUnit : glUnits) {
+            glUnit.draw(mVPMatrix);
+        }
+
+        DEBUG_TEXT[0] = game.getTime() + "";
         /**
          if (DEBBUGGING) {
              for(int i = 0; i < DEBUG_TEXT.length; i++) {
@@ -148,6 +151,21 @@ public class GameRenderer implements GLSurfaceView.Renderer {
              }
          }
          */
+    }
+
+    public void addAllGLUnits(ArrayList<Unit> units) {
+        for (Unit unit : units) {
+            switch (unit.getType()) {
+                case ARMY:
+                    glUnits.add(new GLArmy((Army) unit));
+                    break;
+                case BASE:
+                    glUnits.add(new GLBase((Base) unit));
+                    break;
+                default:
+                    Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getType());
+            }
+        }
     }
 
     public float getViewX() {

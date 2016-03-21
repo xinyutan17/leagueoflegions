@@ -1,13 +1,14 @@
 package com.example.dennis.leagueoflegions.model.unit;
 
-import com.example.dennis.leagueoflegions.gl.unit.GLBase;
 import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
 
 public class Base extends Unit {
     private static final UnitType UNIT_TYPE = UnitType.BASE;
-    private static final int DEFAULT_SIZE = 10;
-    private static final int DEFAULT_SPEED = 5;
+    private static final float DEFAULT_SCALE = 10f;
+    private static final float DEFAULT_ROTATION = 0f;
+    private static final float DEFAULT_SIZE = 10f;
+    private static final float DEFAULT_SPEED = 5f;
 
     private static final float DEFAULT_SPAWN_RATE = 3.0f;
 
@@ -15,10 +16,7 @@ public class Base extends Unit {
     private float lastSpawnTime;
 
     public Base(Player player, float x, float y) {
-        super(player, x, y);
-
-        setSize(DEFAULT_SIZE);
-        setSpeed(DEFAULT_SPEED);
+        super(player, x, y, DEFAULT_SCALE, DEFAULT_ROTATION, DEFAULT_SIZE, DEFAULT_SPEED);
 
         spawnRate = DEFAULT_SPAWN_RATE;
         lastSpawnTime = player.getGame().getTime();
@@ -48,10 +46,5 @@ public class Base extends Unit {
     public UnitType getType()
     {
         return UNIT_TYPE;
-    }
-
-    @Override
-    public void instantiateGLObject() {
-        setGlObject(new GLBase(this));
     }
 }

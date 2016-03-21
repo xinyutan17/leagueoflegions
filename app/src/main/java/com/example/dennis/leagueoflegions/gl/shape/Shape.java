@@ -9,10 +9,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-/**
- * Created by Dennis on 3/20/2016.
- */
-
 public abstract class Shape {
     private static final String DEBUG_TAG = "Shape";
 
