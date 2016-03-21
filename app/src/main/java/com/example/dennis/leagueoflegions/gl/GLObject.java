@@ -31,6 +31,7 @@ public abstract class GLObject {
 
     public GLObject(GameObject gameObject) {
         this.gameObject = gameObject;
+        gameObject.setGlObject(this);
     }
 
     public float[] getMVPMatrix(float[] mVPMatrix) {
@@ -50,4 +51,5 @@ public abstract class GLObject {
     }
 
     public abstract void draw(float[] mVPMatrix);
+    public abstract void tick();
 }

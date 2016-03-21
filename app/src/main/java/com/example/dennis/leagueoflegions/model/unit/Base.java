@@ -1,5 +1,6 @@
 package com.example.dennis.leagueoflegions.model.unit;
 
+import com.example.dennis.leagueoflegions.gl.unit.GLBase;
 import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
 
@@ -15,6 +16,8 @@ public class Base extends Unit {
 
     public Base(Player player, float x, float y) {
         super(player, x, y);
+        setGlObject(new GLBase(this));
+
         setSize(DEFAULT_SIZE);
         setSpeed(DEFAULT_SPEED);
 

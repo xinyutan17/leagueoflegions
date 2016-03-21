@@ -1,7 +1,5 @@
 package com.example.dennis.leagueoflegions.model;
 
-import android.graphics.Color;
-
 import com.example.dennis.leagueoflegions.model.unit.Base;
 
 import java.util.ArrayList;
@@ -19,20 +17,17 @@ public class Game {
 
     public Game(){
         players = new ArrayList<Player>();
-
-        Player p1 = new Player(this, Color.BLUE);
-        p1.addUnit(new Base(p1, 100, 100));
-        players.add(p1);
-
-        Player p2 = new Player(this, Color.RED);
-        p2.addUnit(new Base(p2, 800, 100));
-        players.add(p2);
+        map = new Map();
 
         startTime = System.currentTimeMillis();
         gameTime = 0f;
         elapsedTime = 0f;
+    }
 
-        map = new Map();
+    public void addPlayer(float[] color, float baseX, float baseY) {
+        Player player = new Player(this, color);
+        player.addUnit(new Base(player, baseX, baseY));
+        players.add(player);
     }
 
     public ArrayList<Player> getPlayers()
@@ -52,5 +47,9 @@ public class Game {
 
     public float getElapsedTime() {
         return elapsedTime;
+    }
+
+    public void tick() {
+
     }
 }

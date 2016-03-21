@@ -2,7 +2,7 @@ package com.example.dennis.leagueoflegions.gl.shape;
 
 import android.opengl.GLES20;
 
-import com.example.dennis.leagueoflegions.view.GLRenderer;
+import com.example.dennis.leagueoflegions.gl.GLUtility;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -68,8 +68,8 @@ public abstract class Shape {
     }
 
     private void createProgram() {
-        int vertexShader = GLRenderer.loadShader(GLES20.GL_VERTEX_SHADER, getVertexShaderCode());
-        int fragmentShader = GLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, getFragmentShaderCode());
+        int vertexShader = GLUtility.loadShader(GLES20.GL_VERTEX_SHADER, getVertexShaderCode());
+        int fragmentShader = GLUtility.loadShader(GLES20.GL_FRAGMENT_SHADER, getFragmentShaderCode());
 
         mProgram = GLES20.glCreateProgram();
         GLES20.glAttachShader(mProgram, vertexShader);
@@ -126,9 +126,9 @@ public abstract class Shape {
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
-        GLRenderer.checkGlError("glGetUniformLocation");
+        GLUtility.checkGlError("glGetUniformLocation");
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
-        GLRenderer.checkGlError("glUniformMatrix4fv");
+        GLUtility.checkGlError("glUniformMatrix4fv");
 
         GLES20.glDrawElements(GL_DRAW_TYPE, drawOrder.length, GLES20.GL_UNSIGNED_SHORT, drawOrderBuffer);
         GLES20.glDisableVertexAttribArray(mPositionHandle);

@@ -19,6 +19,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.example.dennis.leagueoflegions.gl.shape.Triangle;
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
@@ -55,9 +56,14 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private Game game;
     private long mLastTime;
 
+    private Triangle triangle;
+
     public GameRenderer(Game game) {
         this.game = game;
         mLastTime = System.currentTimeMillis();
+
+        float[] blue = {0f, 0f, 1f, 1f};
+        triangle = new Triangle(blue);
     }
 
     @Override
@@ -86,8 +92,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             return;
         }
 
+//        Log.d(DEBUG_TAG, "game time: " + game.getTime());
         update();
-        draw();
+//        draw();
 
         mLastTime = now;
     }
@@ -105,7 +112,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             ArrayList<Unit> units = p.getUnits();
             for(int i = 0; i < units.size(); i++)
             {
-                units.get(i).update();
+                units.get(i).tick();
             }
         }
     }
@@ -125,6 +132,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         // Combine view and project matrices
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
+        triangle.draw(mVPMatrix);
+        /**
         // Draw units
         ArrayList<Player> players = game.getPlayers();
         for(Player player : players) {
@@ -132,6 +141,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                 unit.draw(mVPMatrix);
             }
         }
+         */
 
         /**
          if (DEBBUGGING) {

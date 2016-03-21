@@ -3,12 +3,18 @@ package com.example.dennis.leagueoflegions.view;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.example.dennis.leagueoflegions.gl.GLTerrain;
+import com.example.dennis.leagueoflegions.gl.GLUnit;
 import com.example.dennis.leagueoflegions.model.Game;
+
+import java.util.ArrayList;
 
 public class GameActivity extends Activity {
 
     private GameView gameView;
     private Game game;
+    private ArrayList<GLUnit> glUnits;
+    private ArrayList<GLTerrain> glTerrains;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +25,11 @@ public class GameActivity extends Activity {
         Game.GameType gameType = (Game.GameType) getIntent().getSerializableExtra(Game.GAME_TYPE);
 
         game = new Game();
+        float[] blue = {0f, 0f, 1f, 1f};
+        float[] red  = {1f, 0f, 0f, 1f};
+//        game.addPlayer(blue, 100f, 100f);
+//        game.addPlayer(red,  500f, 100f);
+
         gameView = new GameView(this, game);
         setContentView(gameView);
     }

@@ -1,5 +1,6 @@
 package com.example.dennis.leagueoflegions.model.unit;
 
+import com.example.dennis.leagueoflegions.gl.unit.GLArmy;
 import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
 
@@ -10,6 +11,8 @@ public class Army extends Unit {
 
     public Army(Player player, float  x, float y) {
         super(player, x, y);
+        setGlObject(new GLArmy(this));
+
         setSize(DEFAULT_SIZE);
         setSpeed(DEFAULT_SPEED);
     }

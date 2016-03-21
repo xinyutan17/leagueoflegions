@@ -1,26 +1,26 @@
 package com.example.dennis.leagueoflegions.gl.unit;
 
 import com.example.dennis.leagueoflegions.gl.GLUnit;
-import com.example.dennis.leagueoflegions.gl.shape.AnimatedCircle;
+import com.example.dennis.leagueoflegions.gl.shape.Square;
 import com.example.dennis.leagueoflegions.model.GameObject;
 
-public class GLArmy extends GLUnit {
+public class GLBase extends GLUnit {
 
-    private AnimatedCircle animatedCircle;
+    private Square square;
 
-    public GLArmy(GameObject gameObject) {
+    public GLBase(GameObject gameObject) {
         super(gameObject);
-        animatedCircle = new AnimatedCircle(gameObject.getColor());
+        square = new Square(gameObject.getColor());
     }
 
     @Override
     public void draw(float[] mVPMatrix) {
         float[] mMVPMatrix = getMVPMatrix(mVPMatrix);
-        animatedCircle.draw(mMVPMatrix);
+        square.draw(mMVPMatrix);
     }
 
     @Override
     public void tick() {
-        animatedCircle.tick();
+
     }
 }
