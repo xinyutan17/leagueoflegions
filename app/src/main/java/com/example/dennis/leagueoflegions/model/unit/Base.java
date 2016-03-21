@@ -16,7 +16,6 @@ public class Base extends Unit {
 
     public Base(Player player, float x, float y) {
         super(player, x, y);
-        setGlObject(new GLBase(this));
 
         setSize(DEFAULT_SIZE);
         setSpeed(DEFAULT_SPEED);
@@ -49,5 +48,10 @@ public class Base extends Unit {
     public UnitType getType()
     {
         return UNIT_TYPE;
+    }
+
+    @Override
+    public void instantiateGLObject() {
+        setGlObject(new GLBase(this));
     }
 }

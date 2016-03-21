@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -34,6 +33,7 @@ public class GameView extends GLSurfaceView {
         super(context);
         setEGLContextClientVersion(2);
 
+        this.game = game;
         mRenderer = new GameRenderer(game);
         setRenderer(mRenderer);
 //        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
@@ -42,11 +42,8 @@ public class GameView extends GLSurfaceView {
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2,
                                     float distanceX, float distanceY) {
-                mRenderer.setViewX(mRenderer.getViewX() + distanceX / 100);
-                mRenderer.setViewY(mRenderer.getViewY() + distanceY / 100);
-                Log.d(DEBUG_TAG, "onScroll: (" + mRenderer.getViewX() + ", " + mRenderer.getViewY() + ")");
-
-                requestRender();
+                mRenderer.setViewX(mRenderer.getViewX() + 1f / mRenderer.getProjectionScale() * distanceX / 5);
+                mRenderer.setViewY(mRenderer.getViewY() + 1f / mRenderer.getProjectionScale() * distanceY / 5);
                 return true;
             }
         });
@@ -57,9 +54,6 @@ public class GameView extends GLSurfaceView {
                 float mScaleFactor = mRenderer.getProjectionScale() * detector.getScaleFactor();
                 mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
                 mRenderer.setProjectionScale(mScaleFactor);
-                Log.d(DEBUG_TAG, "onScale: " + mRenderer.getProjectionScale());
-
-                requestRender();
                 return true;
             }
         });

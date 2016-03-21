@@ -11,7 +11,6 @@ public class Army extends Unit {
 
     public Army(Player player, float  x, float y) {
         super(player, x, y);
-        setGlObject(new GLArmy(this));
 
         setSize(DEFAULT_SIZE);
         setSpeed(DEFAULT_SPEED);
@@ -26,5 +25,10 @@ public class Army extends Unit {
     public UnitType getType()
     {
         return UNIT_TYPE;
+    }
+
+    @Override
+    public void instantiateGLObject() {
+        setGlObject(new GLArmy(this));
     }
 }

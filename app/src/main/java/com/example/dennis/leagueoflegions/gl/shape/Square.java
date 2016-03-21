@@ -5,16 +5,15 @@ import android.opengl.GLES20;
 public class Square extends Shape {
 
     private static float vertices[] = {
-            // in counterclockwise order:
-            -0.5f,  0.5f, 0.0f,     // top left
-            -0.5f, -0.5f, 0.0f,     // bottom left
-            0.5f, -0.5f, 0.0f,      // bottom right
-            0.5f,  0.5f, 0.0f       // top right
+            (float) Math.cos(Math.PI/4 + 0*Math.PI/2), (float) Math.sin(Math.PI/4 + 0*Math.PI/2), 0.0f, // top right
+            (float) Math.cos(Math.PI/4 + 1*Math.PI/2), (float) Math.sin(Math.PI/4 + 1*Math.PI/2), 0.0f, // top left
+            (float) Math.cos(Math.PI/4 + 2*Math.PI/2), (float) Math.sin(Math.PI/4 + 2*Math.PI/2), 0.0f, // bottom left
+            (float) Math.cos(Math.PI/4 + 3*Math.PI/2), (float) Math.sin(Math.PI/4 + 3*Math.PI/2), 0.0f, // bottom right
     };
     private static short drawOrder[] = {0, 1, 2, 3};
 
     public Square(float[] color) {
-        super(vertices, drawOrder, GLES20.GL_TRIANGLE_STRIP, color);
+        super(vertices, drawOrder, GLES20.GL_TRIANGLE_FAN, color);
     }
 }
 

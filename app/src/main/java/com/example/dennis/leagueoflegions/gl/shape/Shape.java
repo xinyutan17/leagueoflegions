@@ -14,12 +14,12 @@ import java.nio.ShortBuffer;
  */
 
 public abstract class Shape {
+    private static final String DEBUG_TAG = "Shape";
+
     public static final int BYTES_PER_SHORT = 2;
     public static final int BYTES_PER_FLOAT = 4;
     public static final int COORDS_PER_VERTEX = 3;
     public static final int VERTEX_STRIDE = COORDS_PER_VERTEX * BYTES_PER_FLOAT;
-
-    final float[] mMVPMatrix = new float[16];
 
     private int mProgram;
     private int mPositionHandle;

@@ -6,6 +6,8 @@ import com.example.dennis.leagueoflegions.gl.GLObject;
  * Created by Dennis on 3/20/2016.
  */
 public abstract class GameObject {
+    private static final String DEBUG_TAG = "GameObject";
+
     private GLObject glObject;
     public GameObject() {
         glObject = null;
@@ -31,4 +33,5 @@ public abstract class GameObject {
     public abstract float getY();
     public abstract float getSize();
     public abstract float[] getColor();
+    public abstract void instantiateGLObject();
 }

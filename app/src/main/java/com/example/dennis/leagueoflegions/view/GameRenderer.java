@@ -19,7 +19,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
-import com.example.dennis.leagueoflegions.gl.shape.Triangle;
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
@@ -56,14 +55,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private Game game;
     private long mLastTime;
 
-    private Triangle triangle;
-
     public GameRenderer(Game game) {
         this.game = game;
         mLastTime = System.currentTimeMillis();
-
-        float[] blue = {0f, 0f, 1f, 1f};
-        triangle = new Triangle(blue);
     }
 
     @Override
@@ -74,6 +68,12 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         viewX = 0f;
         viewY = 0f;
         projectionScale = 1f;
+
+        for(Player player : game.getPlayers()) {
+            for(Unit unit : player.getUnits()) {
+                unit.instantiateGLObject();
+            }
+        }
     }
 
     @Override
@@ -92,9 +92,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             return;
         }
 
-//        Log.d(DEBUG_TAG, "game time: " + game.getTime());
         update();
-//        draw();
+        draw();
 
         mLastTime = now;
     }
@@ -102,7 +101,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private void update(){
         game.updateTime();
         DEBUG_TEXT[0] = game.getTime() + "";
-
+        /*
         ArrayList<Player> players = new ArrayList<Player>(game.getPlayers());   // make a copy
         for(Player p : players)
         {
@@ -115,25 +114,25 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                 units.get(i).tick();
             }
         }
+        */
     }
 
     private void draw()
     {
         // Clear background
+        GLES20.glClearColor(1f, 1f, 1f, 1f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // Setup projection matrix
-        Matrix.frustumM(mProjectionMatrix, 0, -viewportRatio, viewportRatio, -1, 1, projectionScale, 100);
+        Matrix.frustumM(mProjectionMatrix, 0, -viewportRatio, viewportRatio, -1, 1, projectionScale, 1000);
 
         // Setup view matrix
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -5, 0, 0, 0f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -100, 0, 0, 0f, 0f, 1.0f, 0.0f);
         Matrix.translateM(mViewMatrix, 0, viewX, viewY, 0f);
 
         // Combine view and project matrices
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        triangle.draw(mVPMatrix);
-        /**
         // Draw units
         ArrayList<Player> players = game.getPlayers();
         for(Player player : players) {
@@ -141,7 +140,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                 unit.draw(mVPMatrix);
             }
         }
-         */
 
         /**
          if (DEBBUGGING) {

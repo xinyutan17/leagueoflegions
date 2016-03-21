@@ -27,8 +27,8 @@ public class GameActivity extends Activity {
         game = new Game();
         float[] blue = {0f, 0f, 1f, 1f};
         float[] red  = {1f, 0f, 0f, 1f};
-//        game.addPlayer(blue, 100f, 100f);
-//        game.addPlayer(red,  500f, 100f);
+        game.addPlayer(blue, 20f, 0f);
+        game.addPlayer(red, -20f, 0f);
 
         gameView = new GameView(this, game);
         setContentView(gameView);

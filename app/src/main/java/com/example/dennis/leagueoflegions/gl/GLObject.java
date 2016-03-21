@@ -8,12 +8,8 @@ import com.example.dennis.leagueoflegions.model.GameObject;
  * Created by Dennis on 3/20/2016.
  */
 public abstract class GLObject {
-    private static float[] ZERO_MATRIX = {
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0
-    };
+    private static final String DEBUG_TAG = "GLObject";
+
     private static float[] IDENTITY_MATRIX = {
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -39,7 +35,7 @@ public abstract class GLObject {
         float y = (float) gameObject.getY();
         float size = (float) gameObject.getSize();
 
-        Matrix.translateM(mTranslationMatrix, 0, ZERO_MATRIX, 0, x, y, 0f);
+        Matrix.translateM(mTranslationMatrix, 0, IDENTITY_MATRIX, 0, x, y, 0f);
         Matrix.scaleM(mScaleMatrix, 0, IDENTITY_MATRIX, 0, size, size, 1f);
         Matrix.setIdentityM(mRotationMatrix, 0);
 
@@ -48,6 +44,14 @@ public abstract class GLObject {
         Matrix.multiplyMM(mMVPMatrix, 0, mVPMatrix, 0, mModelMatrix, 0);
 
         return mMVPMatrix;
+    }
+
+    public String toString(float[] matrix) {
+        String s = "";
+        for (int i = 0; i < matrix.length; i++) {
+            s += matrix[i] + ", ";
+        }
+        return s;
     }
 
     public abstract void draw(float[] mVPMatrix);

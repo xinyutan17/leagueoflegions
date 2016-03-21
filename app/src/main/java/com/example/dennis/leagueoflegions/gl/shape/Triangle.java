@@ -5,15 +5,14 @@ import android.opengl.GLES20;
 public class Triangle extends Shape{
 
     private static float vertices[] = {
-            // in counterclockwise order:
-            0.0f,  0.622008459f, 0.0f,      // top
-            -0.5f, -0.311004243f, 0.0f,     // bottom left
-            0.5f, -0.311004243f, 0.0f       // bottom right
+            (float) Math.cos(Math.PI + 0*Math.PI/3), (float) Math.sin(Math.PI + 0*Math.PI/3), 0.0f, // top
+            (float) Math.cos(Math.PI + 1*Math.PI/3), (float) Math.sin(Math.PI + 1*Math.PI/3), 0.0f, // bottom left
+            (float) Math.cos(Math.PI + 2*Math.PI/3), (float) Math.sin(Math.PI + 2*Math.PI/3), 0.0f  // bottom right
     };
     private static short drawOrder[] = {0, 1, 2};
 
 
     public Triangle(float[] color) {
-        super(vertices, drawOrder, GLES20.GL_TRIANGLES, color);
+        super(vertices, drawOrder, GLES20.GL_TRIANGLE_FAN, color);
     }
 }
