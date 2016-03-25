@@ -93,14 +93,24 @@ public class Game {
     }
 
     public ArrayList<Unit> getUnitsWithinRadius(float x, float y, float radius) {
-        ArrayList<Unit> unitsInRadius = new ArrayList<Unit>();
+        ArrayList<Unit> unitsWithinRadius = new ArrayList<Unit>();
         for (Unit unit : units) {
             float dx = unit.getX() - x;
             float dy = unit.getY() - y;
             if (dx*dx + dy*dy <= radius*radius) {
-                unitsInRadius.add(unit);
+                unitsWithinRadius.add(unit);
             }
         }
-        return unitsInRadius;
+        return unitsWithinRadius;
+    }
+
+    public ArrayList<Unit> getEnemyUnitsWithinRadius(Player player, float x, float y, float radius) {
+        ArrayList<Unit> enemyUnitsWithinRadius = new ArrayList<Unit>();
+        for (Unit unit : getUnitsWithinRadius(x, y, radius)) {
+            if (!unit.getPlayer().equals(player)) {
+                enemyUnitsWithinRadius.add(unit);
+            }
+        }
+        return enemyUnitsWithinRadius;
     }
 }

@@ -9,14 +9,14 @@ public class Circle extends Shape {
 
     private float[] radii;              // the radii for the vertices
 
-    public Circle(float[] color) {
+    public Circle(float[] color, float radius) {
         super(color);
 
         radii = new float[NUMBER_VERTICES];
         float[] vertices = new float[COORDS_PER_VERTEX * TOTAL_VERTICES];
         vertices[0] = vertices[1] = vertices[2] = 0f;
         for (int i = 0; i < NUMBER_VERTICES; i++) {
-            radii[i] = 1f;
+            radii[i] = radius;
             vertices[3*(i+1)+0] = (float) (radii[i]*Math.cos(i*DELTA_ANGLE));
             vertices[3*(i+1)+1] = (float) (radii[i]*Math.sin(i*DELTA_ANGLE));
             vertices[3*(i+1)+2] = 0f;
@@ -41,5 +41,10 @@ public class Circle extends Shape {
 
     public void setRadii(float[] radii) {
         this.radii = radii;
+    }
+
+    @Override
+    public String toString() {
+        return "Circle";
     }
 }

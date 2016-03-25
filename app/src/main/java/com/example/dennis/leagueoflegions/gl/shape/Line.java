@@ -9,4 +9,9 @@ public class Line extends Shape {
         // vertices and drawOrder must be set manually by calling
         // setVertices() and setDrawOrder()
     }
+
+    @Override
+    public String toString() {
+        return "Line";
+    }
 }

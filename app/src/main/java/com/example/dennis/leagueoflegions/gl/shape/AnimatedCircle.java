@@ -7,8 +7,8 @@ public class AnimatedCircle extends Circle {
 
     private float[] radiiStepDir;       // the direction of the radius step at each update
 
-    public AnimatedCircle(float[] color) {
-        super(color);
+    public AnimatedCircle(float[] color, float radius) {
+        super(color, radius);
 
         radiiStepDir = new float[NUMBER_VERTICES];
         for (int i = 0; i < NUMBER_VERTICES; i++) {
@@ -45,5 +45,10 @@ public class AnimatedCircle extends Circle {
         vertices[3*(NUMBER_VERTICES+1)+1] = vertices[3*(0+1)+1];
         setRadii(radii);
         resetVertices(vertices);
+    }
+
+    @Override
+    public String toString() {
+        return "AnimatedCircle";
     }
 }

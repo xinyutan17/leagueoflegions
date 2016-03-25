@@ -30,6 +30,11 @@ public class Player {
         game.addUnitAddQueue(unit);
     }
 
+    public void removeUnit(Unit unit) {
+        units.remove(unit);
+        game.addUnitRemoveQueue(unit);
+    }
+
     public ArrayList<Unit> getUnits()
     {
         return units;

@@ -6,11 +6,16 @@ import com.example.dennis.leagueoflegions.model.unit.Base;
 
 public class GLBase extends GLUnit {
 
-    private Square square;
+    private Square bodySquare;
 
     public GLBase(Base base) {
         super(base);
-        square = new Square(base.getColor());
+        bodySquare = new Square(base.getColor());
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
     }
 
     @Override
@@ -18,11 +23,6 @@ public class GLBase extends GLUnit {
         super.draw(mVPMatrix);
 
         float[] mMVPMatrix = getMVPMatrix(mVPMatrix);
-        square.draw(mMVPMatrix);
-    }
-
-    @Override
-    public void tick() {
-
+        bodySquare.draw(mMVPMatrix);
     }
 }

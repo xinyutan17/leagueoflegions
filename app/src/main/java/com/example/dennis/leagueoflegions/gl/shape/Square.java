@@ -15,5 +15,10 @@ public class Square extends Shape {
     public Square(float[] color) {
         super(vertices, drawOrder, GLES20.GL_TRIANGLE_FAN, color);
     }
+
+    @Override
+    public String toString() {
+        return "Square";
+    }
 }
 

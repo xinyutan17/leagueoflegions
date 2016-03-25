@@ -3,19 +3,22 @@ package com.example.dennis.leagueoflegions.gl;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 
+import com.example.dennis.leagueoflegions.gl.shape.Circle;
 import com.example.dennis.leagueoflegions.gl.shape.Line;
 import com.example.dennis.leagueoflegions.model.Unit;
 
 public abstract class GLUnit extends GLObject {
-    private Line line;
+    private Line pathLine;
+    private Circle rangeCircle;
 
     public GLUnit(Unit unit) {
         super(unit);
-        line = new Line(unit.getColor());
+        pathLine = new Line(unit.getColor());
+        rangeCircle = new Circle(unit.getColor(), unit.getRange() / unit.getScale());
     }
 
     @Override
-    public void draw(float[] mVPMatrix) {
+    public void tick() {
         Unit unit = (Unit) getGameObject();
         Path path = unit.getRemainingPath();
         PathMeasure pm = new PathMeasure(path, false);
@@ -34,8 +37,14 @@ public abstract class GLUnit extends GLObject {
             vertices[3*i + 2] = 0f;
             drawOrder[i] = (short) i;
         }
-        line.setVertices(vertices);
-        line.setDrawOrder(drawOrder);
-        line.draw(mVPMatrix);
+        pathLine.setVertices(vertices);
+        pathLine.setDrawOrder(drawOrder);
+    }
+
+    @Override
+    public void draw(float[] mVPMatrix) {
+        if (!((Unit) getGameObject()).getRemainingPath().isEmpty())
+            pathLine.draw(mVPMatrix);
+        rangeCircle.draw(mVPMatrix);
     }
 }

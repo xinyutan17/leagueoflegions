@@ -3,6 +3,7 @@ package com.example.dennis.leagueoflegions.model;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public abstract class Unit extends GameObject {
@@ -11,30 +12,48 @@ public abstract class Unit extends GameObject {
     // Unit
     private Player player;  // the player that owns this unit
     private float[] color;  // this unit's color
-    private float size;     // this unit's size (i.e. how "powerful" it is)
-    private float speed;    // the speed with which to follow the path
 
-    // Modifiers
-    // TODO
+    // Attributes
+    private float size;     // the unit's size, i.e. number of individuals
+    private float health;   // the health of each individual
+    private float damage;   // the damage per second of each individual
+    private float range;    // the unit's range
+    private float speed;    // the unit's speed
+
+    // Multipliers (set by Terrain elements)
+    private float size_mult;
+    private float health_mult;
+    private float damage_mult;
+    private float range_mult;
+    private float speed_mult;
 
     // Path
-    private Path path;          // this unit's current path
-    private PathMeasure pm;     // path handler
-    private float pathDist;     // path distance traveled (0 to 1 representing fraction of path traveled)
-    private Path remainingPath; // this unit's remaining path
+    private Path path;          // the unit's current path
+    private PathMeasure pm;     // path measure handler
+    private float pathDist;     // the unit's path distance traveled
+    private Path remainingPath; // the unit's remaining path
 
-    public Unit(Player player, float x, float y, float scale, float rotation, float size, float speed)
+    public Unit(Player player, float x, float y, float scale, float rotation)
     {
         super(x, y, scale, rotation);
 
         // Unit
         this.player = player;
         this.color = player.getColor();
-        this.size = size;
-        this.speed = speed;
+
+        // Attributes
+        size = 1f;
+        speed = 1f;
+        health = 1f;
+        damage = 1f;
+        range = 1f;
 
         // Modifiers
-        // TODO
+        size_mult = 1f;
+        speed_mult = 1f;
+        health_mult = 1f;
+        damage_mult = 1f;
+        range_mult = 1f;
 
         // Path
         this.path = new Path();
@@ -44,6 +63,8 @@ public abstract class Unit extends GameObject {
     }
 
     // Unit
+    public abstract UnitType getType();
+
     public Player getPlayer() {
         return player;
     }
@@ -60,22 +81,23 @@ public abstract class Unit extends GameObject {
         this.color = color;
     }
 
+    @Override
+    public float getScale() {
+        return super.getScale() * getSize();
+    }
+
+    @Override
+    public void setScale(float scale) {
+        // do nothing
+    }
+
+    // Attributes
     public float getSize() {
         return size;
     }
 
     public void setSize(float size) {
         this.size = size;
-    }
-
-    @Override
-    public float getScale() {
-        return getSize();
-    }
-
-    @Override
-    public void setScale(float scale) {
-        // do nothing
     }
 
     public float getSpeed() {
@@ -86,8 +108,71 @@ public abstract class Unit extends GameObject {
         this.speed = speed;
     }
 
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
+
+    public float getDamage() {
+        return damage;
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
+    }
+
+    public float getRange() {
+        return range;
+    }
+
+    public void setRange(float range) {
+        this.range = range;
+    }
+
     // Modifiers
-    // TODO
+
+    public float getSizeMult() {
+        return size_mult;
+    }
+
+    public void setSizeMult(float size_mult) {
+        this.size_mult = size_mult;
+    }
+
+    public float getSpeedMult() {
+        return speed_mult;
+    }
+
+    public void setSpeedMult(float speed_mult) {
+        this.speed_mult = speed_mult;
+    }
+
+    public float getHealthMult() {
+        return health_mult;
+    }
+
+    public void setHealthMult(float health_mult) {
+        this.health_mult = health_mult;
+    }
+
+    public float getDamageMult() {
+        return damage_mult;
+    }
+
+    public void setDamageMult(float damage_mult) {
+        this.damage_mult = damage_mult;
+    }
+
+    public float getRangeMult() {
+        return range_mult;
+    }
+
+    public void setRangeMult(float range_mult) {
+        this.range_mult = range_mult;
+    }
 
     // Path
     public Path getPath() {
@@ -114,6 +199,12 @@ public abstract class Unit extends GameObject {
 
     @Override
     public void tick(){
+        ArrayList<Unit> units = getPlayer().getGame().getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), range);
+        float[] randomLottery = randomLottery(units.size());
+        for (int i = 0; i < units.size(); i++) {
+            sendDamage(units.get(i), randomLottery[i] * damage);
+        }
+
         if (!path.isEmpty()) {
             pathDist += speed;
             if (pathDist > pm.getLength()) {
@@ -141,11 +232,33 @@ public abstract class Unit extends GameObject {
         }
     }
 
-    // Abstract
-    public abstract UnitType getType();
+    public void sendDamage(Unit unit, float damage) {
+        unit.receiveDamage(damage);
+    }
+
+    public void receiveDamage(float damage) {
+        size -= damage / (health);
+        if (size <= 0) {
+            getPlayer().removeUnit(this);
+        }
+    }
 
     @Override
     public String toString() {
         return String.format("%s %s at (%f, %f)", Arrays.toString(getColor()), getType().toString(), getX(), getY());
+    }
+
+    private float[] randomLottery(int size) {
+        float[] randomLottery = new float[size];
+        float randomTotal = 0;
+        for (int i = 0; i < size; i++) {
+            float r = (float) Math.random();
+            randomLottery[i] = r;
+            randomTotal += r;
+        }
+        for (int i = 0; i < size; i++) {
+            randomLottery[i] /= randomTotal;
+        }
+        return randomLottery;
     }
 }

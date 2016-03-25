@@ -137,9 +137,13 @@ public abstract class Shape {
         this.color = color;
     }
 
+    public void tick() {
+        // Override to do something at each game tick
+    }
+
     public void draw(float[] mMVPMatrix) {
         if (vertices == null || drawOrder == null || GL_DRAW_TYPE == -1) {
-            Log.e(DEBUG_TAG, "failed to draw shape: null vertices, drawOrder, or GL_DRAW_TYPE");
+            Log.e(DEBUG_TAG,  "failed to draw shape " + toString() + ": null vertices, drawOrder, or GL_DRAW_TYPE");
             return;
         }
 
@@ -162,7 +166,8 @@ public abstract class Shape {
         GLES20.glDisableVertexAttribArray(mPositionHandle);
     }
 
-    public void tick() {
-        // Override to do something at each game tick
+    @Override
+    public String toString() {
+        return "Shape";
     }
 }

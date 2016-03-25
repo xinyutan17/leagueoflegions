@@ -14,4 +14,9 @@ public class Triangle extends Shape{
     public Triangle(float[] color) {
         super(vertices, drawOrder, GLES20.GL_TRIANGLE_FAN, color);
     }
+
+    @Override
+    public String toString() {
+        return "Triangle";
+    }
 }
