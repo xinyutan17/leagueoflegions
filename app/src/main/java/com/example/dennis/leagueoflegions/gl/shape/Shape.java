@@ -157,6 +157,7 @@ public abstract class Shape {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLUtility.checkGlError("glUniformMatrix4fv");
 
+        GLES20.glLineWidth(2f); // TODO: only do this when drawing lines
         GLES20.glDrawElements(GL_DRAW_TYPE, drawOrder.length, GLES20.GL_UNSIGNED_SHORT, drawOrderBuffer);
         GLES20.glDisableVertexAttribArray(mPositionHandle);
     }

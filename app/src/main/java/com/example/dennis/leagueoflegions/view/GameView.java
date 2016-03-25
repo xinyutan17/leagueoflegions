@@ -9,8 +9,9 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 import com.example.dennis.leagueoflegions.model.Game;
-import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
+
+import java.util.ArrayList;
 
 public class GameView extends GLSurfaceView {
     private static final String DEBUG_TAG = "GameView";
@@ -24,10 +25,10 @@ public class GameView extends GLSurfaceView {
     private final GestureDetector mGestureDetector;
     private final ScaleGestureDetector mScaleGestureDetector;
 
+    private Unit selectedUnit;
     private Path path;
     private float pathX, pathY;
-    private Unit selectedUnit;
-    private boolean drawing;
+    private boolean pathing;
 
     public GameView(Context context, Game game){
         super(context);
@@ -74,67 +75,74 @@ public class GameView extends GLSurfaceView {
                 return true;
             }
         });
+
+        selectedUnit = null;
+        path = new Path();
+        pathX = pathY = 0;
+        pathing = false;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        /** TODO: only do one of the following
-         * select unit to draw path
-         * pan map
-         * zoom map (scale)
-         */
-        mScaleGestureDetector.onTouchEvent(event);
-        mGestureDetector.onTouchEvent(event);
+        float[] screenCoors = mRenderer.getScreenCoors(event.getX(), event.getY());
+        float[] worldCoors = mRenderer.screenToWorld(screenCoors);
+        float x = worldCoors[0];
+        float y = worldCoors[1];
 
-        float x = event.getX();
-        float y = event.getY();
+        ArrayList<Unit> selectedUnits = game.getUnitsWithinRadius(x, y, mRenderer.getFieldOfViewY()/50f * TOUCH_SELECT_TOLERANCE);
 
-//        float[] worldCoors = mRenderer.screenToWorld(x, y);
-//        Log.d(DEBUG_TAG, Arrays.toString(worldCoors));
-
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                selectedUnit = null;
-                for (Player player : game.getPlayers()) {
-                    for (Unit unit : player.getUnits()) {
-                        if (Math.abs(unit.getX() - x) < unit.getSize() + TOUCH_SELECT_TOLERANCE &&
-                                Math.abs(unit.getY() - y) < unit.getSize() + TOUCH_SELECT_TOLERANCE) {
-                            selectedUnit = unit;
-                            drawing = true;
-                        }
-                    }
-                }
-                if (drawing) {
-                    path.reset();
-                    path.moveTo(selectedUnit.getX(), selectedUnit.getY());
-                    PathMeasure pm = new PathMeasure(path, false);
-                    pathX = selectedUnit.getX();
-                    pathY = selectedUnit.getY();
-                    selectedUnit.setPath(path);
-                }
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (drawing) {
+        if (pathing) {
+            switch(event.getAction()) {
+                case MotionEvent.ACTION_MOVE:
                     if (Math.abs(x - pathX) >= TOUCH_MOVE_TOLERANCE || Math.abs(y - pathY) >= TOUCH_MOVE_TOLERANCE) {
                         path.quadTo(pathX, pathY, (x + pathX) / 2, (y + pathY) / 2);
                         pathX = x;
                         pathY = y;
                         selectedUnit.updatePath(path);
                     }
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if (drawing) {
+                    break;
+                case MotionEvent.ACTION_UP:
                     path.lineTo(pathX, pathY);
                     selectedUnit.updatePath(path);
 
                     path.reset();
                     pathX = pathY = 0;
                     selectedUnit = null;
-                    drawing = false;
-                }
-                break;
+                    pathing = false;
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+
+        if (!selectedUnits.isEmpty()) {
+//            Log.d(DEBUG_TAG, "SELECTED UNITS");
+//            for (Unit unit : selectedUnits) {
+//                Log.d(DEBUG_TAG, unit.toString());
+//            }
+
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                selectedUnit = selectedUnits.get(0);
+                pathing = true;
+
+                path.reset();
+                path.moveTo(selectedUnit.getX(), selectedUnit.getY());
+                PathMeasure pm = new PathMeasure(path, false);
+                pathX = selectedUnit.getX();
+                pathY = selectedUnit.getY();
+                selectedUnit.setPath(path);
+
+                return true;
+            }
+        }
+
+        if (selectedUnits.isEmpty()) {
+            mScaleGestureDetector.onTouchEvent(event);
+            mGestureDetector.onTouchEvent(event);
+
+            return true;
         }
 
         return true;

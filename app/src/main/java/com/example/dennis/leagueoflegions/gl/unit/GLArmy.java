@@ -15,6 +15,8 @@ public class GLArmy extends GLUnit {
 
     @Override
     public void draw(float[] mVPMatrix) {
+        super.draw(mVPMatrix);
+
         float[] mMVPMatrix = getMVPMatrix(mVPMatrix);
         animatedCircle.draw(mMVPMatrix);
     }
