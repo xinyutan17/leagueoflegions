@@ -48,4 +48,25 @@ public class GLUtility {
             throw new RuntimeException(glOperation + ": glError " + error);
         }
     }
+
+    /**
+     * Log a 4x4 matrix.
+     * @param name
+     * @param matrix
+     */
+    public static void logMatrix(String name, float[] matrix) {
+        if (matrix.length != 16) {
+            return;
+        }
+        Log.d(DEBUG_TAG, name);
+        String str = "";
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                str += String.format("%8.2f, ", matrix[4*j + i]);
+            }
+            Log.d(DEBUG_TAG, str);
+            str = "";
+        }
+        Log.d(DEBUG_TAG, "\n");
+    }
 }

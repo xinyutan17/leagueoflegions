@@ -3,6 +3,8 @@ package com.example.dennis.leagueoflegions.model;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 
+import java.util.Arrays;
+
 public abstract class Unit extends GameObject {
     public enum UnitType {BASE, ARMY}
 
@@ -141,4 +143,9 @@ public abstract class Unit extends GameObject {
 
     // Abstract
     public abstract UnitType getType();
+
+    @Override
+    public String toString() {
+        return String.format("%s %s at (%f, %f)", Arrays.toString(getColor()), getType().toString(), getX(), getY());
+    }
 }

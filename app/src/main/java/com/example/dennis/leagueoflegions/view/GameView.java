@@ -42,8 +42,9 @@ public class GameView extends GLSurfaceView {
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2,
                                     float distanceX, float distanceY) {
-                mRenderer.setViewX(mRenderer.getViewX() + 1f / mRenderer.getProjectionScale() * distanceX / 5);
-                mRenderer.setViewY(mRenderer.getViewY() + 1f / mRenderer.getProjectionScale() * distanceY / 5);
+                float viewX = mRenderer.getViewX() + 0.02f * mRenderer.getFieldOfViewY() * distanceX;
+                float viewY = mRenderer.getViewY() + 0.02f * mRenderer.getFieldOfViewY() * distanceY;
+                mRenderer.setView(viewX, viewY);
                 return true;
             }
         });
@@ -51,9 +52,25 @@ public class GameView extends GLSurfaceView {
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                float mScaleFactor = mRenderer.getProjectionScale() * detector.getScaleFactor();
-                mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
-                mRenderer.setProjectionScale(mScaleFactor);
+                float[] screenCoors = mRenderer.getScreenCoors(detector.getFocusX(), detector.getFocusY());
+
+                // Calculate world coordinates before scaling
+                float[] worldCoors = mRenderer.screenToWorld(screenCoors);
+
+                // Scale
+                float fovy = 1f/detector.getScaleFactor() * mRenderer.getFieldOfViewY();
+                fovy = Math.max(GameRenderer.MIN_FOVY, Math.min(fovy, GameRenderer.MAX_FOVY));
+                mRenderer.setFieldOfViewY(fovy);
+
+                // Calculate eye coordinates of worldCoors and screenCoors after scaling
+                float[] eyeCoorsWorld = mRenderer.worldToEye(worldCoors);
+                float[] eyeCoorsScreen = mRenderer.screenToEye(screenCoors);
+
+                // Move Camera
+                float viewX = mRenderer.getViewX() + (eyeCoorsWorld[0] - eyeCoorsScreen[0]);
+                float viewY = mRenderer.getViewY() + (eyeCoorsWorld[1] - eyeCoorsScreen[1]);
+                mRenderer.setView(viewX, viewY);
+
                 return true;
             }
         });
@@ -72,6 +89,9 @@ public class GameView extends GLSurfaceView {
 
         float x = event.getX();
         float y = event.getY();
+
+//        float[] worldCoors = mRenderer.screenToWorld(x, y);
+//        Log.d(DEBUG_TAG, Arrays.toString(worldCoors));
 
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:

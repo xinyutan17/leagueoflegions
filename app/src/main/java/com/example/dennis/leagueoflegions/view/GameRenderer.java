@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.example.dennis.leagueoflegions.gl.GLTerrain;
 import com.example.dennis.leagueoflegions.gl.GLUnit;
+import com.example.dennis.leagueoflegions.gl.GLUtility;
 import com.example.dennis.leagueoflegions.gl.unit.GLArmy;
 import com.example.dennis.leagueoflegions.gl.unit.GLBase;
 import com.example.dennis.leagueoflegions.model.Game;
@@ -45,18 +46,23 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class GameRenderer implements GLSurfaceView.Renderer {
     private static final String DEBUG_TAG = "GameRenderer";
-    private static final boolean DEBBUGGING = true;
     private static final String[] DEBUG_TEXT = new String[]{"","","","",""};
-    private static final int FPS = 60;
+
+    private static final float CAMERA_DISTANCE = 500f;
+    public static final float MIN_FOVY = 30f;
+    public static final float MAX_FOVY = 150f;
+    public static final int FPS = 60;
 
     private final float[] mVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
 
     private float viewportRatio;
+    private float screenWidth;
+    private float screenHeight;
     private float viewX;
     private float viewY;
-    private float projectionScale;
+    private float fieldOfViewY;
 
     private Game game;
     private ArrayList<GLUnit> glUnits;
@@ -70,7 +76,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         glUnits = new ArrayList<GLUnit>();
         glUnitRemoveQueue = new ArrayList<GLUnit>();
         glTerrains = new ArrayList<GLTerrain>();
-
     }
 
     @Override
@@ -80,7 +85,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
         viewX = 0f;
         viewY = 0f;
-        projectionScale = 1f;
+        fieldOfViewY = 120f;
 
         mLastTime = System.currentTimeMillis();
 
@@ -88,16 +93,30 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
 
     @Override
-    public void onSurfaceChanged(GL10 unused, int width, int height) {
+    public void onSurfaceChanged(GL10 gl10, int width, int height) {
         // Adjust the viewport based on geometry changes,
         // such as screen rotation
         GLES20.glViewport(0, 0, width, height);
 
+        screenWidth = width;
+        screenHeight = height;
         viewportRatio = (float) width / height;
+
+        // Setup view-projection matrix
+        Matrix.perspectiveM(mProjectionMatrix, 0, fieldOfViewY, viewportRatio, -1, 1);
+//        Matrix.orthoM(mProjectionMatrix, 0, -1, 1, -viewportRatio, viewportRatio, -1, 1);
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, CAMERA_DISTANCE, 0, 0, 0f, 0f, 1.0f, 0.0f);
+        Matrix.translateM(mViewMatrix, 0, -viewX, -viewY, 0f);
+        Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
+        if (GameActivity.DEBUGGING) {
+            if (game.getTime() > 1f) {
+                return;
+            }
+        }
         long now = System.currentTimeMillis();
         if (now - mLastTime < 1000.0/FPS) {
             return;
@@ -129,15 +148,15 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
 
     private void draw() {
-        // Setup view-projection matrix
-        Matrix.frustumM(mProjectionMatrix, 0, -viewportRatio, viewportRatio, -1, 1, projectionScale, 1000);
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -100, 0, 0, 0f, 0f, 1.0f, 0.0f);
-        Matrix.translateM(mViewMatrix, 0, viewX, viewY, 0f);
-        Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
-
         // Draw background
         GLES20.glClearColor(1f, 1f, 1f, 1f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        if (GameActivity.DEBUGGING) {
+            Log.d(DEBUG_TAG, "@@@@@@@@@@@@ Begin draw. @@@@@@@@@@@@");
+            GLUtility.logMatrix("mViewMatrix", mViewMatrix);
+            GLUtility.logMatrix("mProjectionMatrix", mProjectionMatrix);
+        }
 
         // Draw Terrains
         for(GLTerrain glTerrain : glTerrains) {
@@ -178,23 +197,73 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         return viewX;
     }
 
-    public void setViewX(float x) {
-        viewX = x;
-    }
-
     public float getViewY() {
         return viewY;
     }
 
-    public void setViewY(float y) {
+    public void setView(float x, float y) {
+        viewX = x;
         viewY = y;
+
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, CAMERA_DISTANCE, 0, 0, 0f, 0f, 1.0f, 0.0f);
+        Matrix.translateM(mViewMatrix, 0, -viewX, -viewY, 0f);
+        Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
     }
 
-    public float getProjectionScale() {
-        return projectionScale;
+    public float getFieldOfViewY() {
+        return fieldOfViewY;
     }
 
-    public void setProjectionScale(float scale) {
-        projectionScale = scale;
+    public void setFieldOfViewY(float fovy) {
+        fieldOfViewY = fovy;
+
+        Matrix.perspectiveM(mProjectionMatrix, 0, fieldOfViewY, viewportRatio, -1, 1);
+        Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+    }
+
+    public float[] getScreenCoors(float screenX, float screenY) {
+        screenY = screenHeight - screenY;   // invert y, as Android uses top-left, OpenGL uses bottom-left
+
+        float[] screenCoors = new float[4];
+        screenCoors[0] = 2f * screenX / screenWidth - 1f;
+        screenCoors[1] = 2f * screenY / screenHeight - 1f;
+        screenCoors[2] = 1f / CAMERA_DISTANCE;  // THE MAGIC VALUE
+        screenCoors[3] = 1f;
+
+        return screenCoors;
+    }
+
+    public void normalize(float[] vector) {
+        float scaleFactor = vector[3];
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] /= scaleFactor;
+        }
+    }
+
+    public float[] screenToWorld(float[] screenCoors) {
+        float[] mInvertedVPMatrix = new float[16];
+        Matrix.invertM(mInvertedVPMatrix, 0, mVPMatrix, 0);
+
+        float[] worldCoors = new float[4];
+        Matrix.multiplyMV(worldCoors, 0, mInvertedVPMatrix, 0, screenCoors, 0);
+        normalize(worldCoors);
+        return worldCoors;
+    }
+
+    public float[] screenToEye(float[] screenCoors) {
+        float[] mInvertedPMatrix = new float[16];
+        Matrix.invertM(mInvertedPMatrix, 0, mProjectionMatrix, 0);
+
+        float[] eyeCoors = new float[4];
+        Matrix.multiplyMV(eyeCoors, 0, mInvertedPMatrix, 0, screenCoors, 0);
+        normalize(eyeCoors);
+        return eyeCoors;
+    }
+
+    public float[] worldToEye(float[] worldCoors) {
+        float[] eyeCoors = new float[4];
+        Matrix.multiplyMV(eyeCoors, 0, mViewMatrix, 0, worldCoors, 0);
+        normalize(eyeCoors);
+        return eyeCoors;
     }
 }

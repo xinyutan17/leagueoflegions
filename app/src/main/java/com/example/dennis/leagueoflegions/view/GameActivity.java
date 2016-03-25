@@ -10,6 +10,7 @@ import com.example.dennis.leagueoflegions.model.Game;
 import java.util.ArrayList;
 
 public class GameActivity extends Activity {
+    public static final boolean DEBUGGING = false;
 
     private GameView gameView;
     private Game game;
@@ -27,8 +28,16 @@ public class GameActivity extends Activity {
         game = new Game();
         float[] blue = {0f, 0f, 1f, 1f};
         float[] red  = {1f, 0f, 0f, 1f};
-        game.addPlayer(blue, 50f, 0f);
-        game.addPlayer(red, -50f, 0f);
+        float[] green = {0f, 1f, 0f, 1f};
+//        for (int i = -5; i <= 5; i++) {
+//            game.addPlayer(blue, 100*i, 0f);
+//        }
+//        for (int i = -5; i <= 5; i++) {
+//            game.addPlayer(red, 0f, 100*i);
+//        }
+        game.addPlayer(blue, -500f, 0f);
+        game.addPlayer(green, 0f, 0f);
+        game.addPlayer(red, 500f, 0f);
 
         gameView = new GameView(this, game);
         setContentView(gameView);

@@ -29,7 +29,7 @@ public class Base extends Unit {
         float gameTime = getPlayer().getGame().getTime();
         if (gameTime - lastSpawnTime > spawnRate) {
             Player selfPlayer = getPlayer();
-            double radius = 2*(1 + Math.random()) * getSize();
+            double radius = 4 * (1 + Math.random()) * getSize();
             double angle = Math.random() * 2*Math.PI;
             float xOffset = (float)(radius * Math.cos(angle));
             float yOffset = (float)(radius * Math.sin(angle));
