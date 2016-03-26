@@ -32,6 +32,7 @@ public abstract class Unit extends GameObject {
     private PathMeasure pm;     // path measure handler
     private float pathDist;     // the unit's path distance traveled
     private Path remainingPath; // the unit's remaining path
+    private boolean pathing;    // whether or not user is pathing this unit
 
     public Unit(Player player, float x, float y, float scale, float rotation)
     {
@@ -56,10 +57,11 @@ public abstract class Unit extends GameObject {
         range_mult = 1f;
 
         // Path
-        this.path = new Path();
-        this.pm = new PathMeasure();
-        this.pathDist = 0f;
-        this.remainingPath = new Path();
+        path = new Path();
+        pm = new PathMeasure();
+        pathDist = 0f;
+        remainingPath = new Path();
+        pathing = false;
     }
 
     // Unit
@@ -197,6 +199,14 @@ public abstract class Unit extends GameObject {
         // don't change pathDist or remainingPath
     }
 
+    public void setPathing(boolean pathing) {
+        this.pathing = pathing;
+    }
+
+    public boolean getPathing() {
+        return pathing;
+    }
+
     @Override
     public void tick(){
         ArrayList<Unit> units = getPlayer().getGame().getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), range);
@@ -205,7 +215,7 @@ public abstract class Unit extends GameObject {
             sendDamage(units.get(i), randomLottery[i] * damage);
         }
 
-        if (!path.isEmpty()) {
+        if (!path.isEmpty() && pm.getLength() > 0) {
             pathDist += speed;
             if (pathDist > pm.getLength()) {
                 pathDist = pm.getLength();
@@ -223,11 +233,12 @@ public abstract class Unit extends GameObject {
             remainingPath.reset();
             pm.getSegment(pathDist, pm.getLength(), remainingPath, true);
 
-            if (pathDist == pm.getLength()) {
+            if (pathDist == pm.getLength() && !pathing) {
                 path.reset();
-                remainingPath.reset();
                 pm.setPath(null, false);
-                pathDist = 0;
+                pathDist = 0f;
+                remainingPath.reset();
+                pathing = false;
             }
         }
     }

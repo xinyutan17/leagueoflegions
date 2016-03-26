@@ -126,6 +126,7 @@ public class GameView extends GLSurfaceView {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 selectedUnit = selectedUnits.get(0);
                 pathing = true;
+                selectedUnit.setPathing(true);
 
                 path.reset();
                 path.moveTo(selectedUnit.getX(), selectedUnit.getY());

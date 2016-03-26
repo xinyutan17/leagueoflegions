@@ -29,12 +29,6 @@ public class GameActivity extends Activity {
         float[] blue = {0f, 0f, 1f, 1f};
         float[] red  = {1f, 0f, 0f, 1f};
         float[] green = {0f, 1f, 0f, 1f};
-//        for (int i = -5; i <= 5; i++) {
-//            game.addPlayer(blue, 100*i, 0f);
-//        }
-//        for (int i = -5; i <= 5; i++) {
-//            game.addPlayer(red, 0f, 100*i);
-//        }
         game.addPlayer(blue, -500f, 0f);
         game.addPlayer(green, 0f, 0f);
         game.addPlayer(red, 500f, 0f);
