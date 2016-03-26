@@ -83,6 +83,16 @@ public abstract class Unit extends GameObject {
         this.color = color;
     }
 
+    @Override
+    public float getScale() {
+        return super.getScale() * getSize();
+    }
+
+    @Override
+    public void setScale(float scale) {
+        // do nothing
+    }
+
     // Attributes
     public float getSize() {
         return size;
@@ -199,10 +209,11 @@ public abstract class Unit extends GameObject {
 
     @Override
     public void tick(){
-        ArrayList<Unit> units = getPlayer().getGame().getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), range);
+        Game game = getPlayer().getGame();
+        ArrayList<Unit> units = game.getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), range);
         float[] randomLottery = randomLottery(units.size());
         for (int i = 0; i < units.size(); i++) {
-            sendDamage(units.get(i), randomLottery[i] * damage);
+            sendDamage(units.get(i), randomLottery[i] * game.getElapsedTime() * getSize() * damage);
         }
 
         if (!path.isEmpty() && pm.getLength() > 0) {

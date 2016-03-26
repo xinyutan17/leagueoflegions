@@ -9,8 +9,8 @@ public class Base extends Unit {
     private static final float DEFAULT_ROTATION = 0f;
 
     private static final float DEFAULT_SIZE = 1f;
-    private static final float DEFAULT_HEALTH = 100f;
-    private static final float DEFAULT_DAMAGE = 10f;
+    private static final float DEFAULT_HEALTH = 10;
+    private static final float DEFAULT_DAMAGE = 1f;
     private static final float DEFAULT_RANGE = 20f;
     private static final float DEFAULT_SPEED = 3f;
 
