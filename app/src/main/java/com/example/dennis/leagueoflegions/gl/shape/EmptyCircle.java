@@ -17,12 +17,6 @@ public class EmptyCircle extends Shape {
         }
         setVertices(vertices);
 
-        short[] drawOrder = new short[NUMBER_VERTICES];
-        for(short i = 0; i < NUMBER_VERTICES; i++) {
-            drawOrder[i] = i;
-        }
-        setDrawOrder(drawOrder);
-
         setGL_DRAW_TYPE(GLES20.GL_LINE_LOOP);
     }
 

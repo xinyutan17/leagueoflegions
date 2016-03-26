@@ -26,12 +26,6 @@ public class Circle extends Shape {
         vertices[3*(NUMBER_VERTICES+1)+2] = vertices[3*(0+1)+2];
         setVertices(vertices);
 
-        short[] drawOrder = new short[TOTAL_VERTICES];
-        for(short i = 0; i < TOTAL_VERTICES; i++) {
-            drawOrder[i] = i;
-        }
-        setDrawOrder(drawOrder);
-
         setGL_DRAW_TYPE(GLES20.GL_TRIANGLE_FAN);
     }
 

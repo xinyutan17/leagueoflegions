@@ -26,17 +26,14 @@ public abstract class GLUnit extends GLObject {
 
             int numVertices = (int) pm.getLength();
             float[] vertices = new float[3 * numVertices];
-            short[] drawOrder = new short[numVertices];
             float[] pathXY = new float[2];
             for (int i = 0; i < numVertices; i++) {
                 pm.getPosTan(i, pathXY, null);
                 vertices[3*i + 0] = pathXY[0];
                 vertices[3*i + 1] = pathXY[1];
                 vertices[3*i + 2] = 0f;
-                drawOrder[i] = (short) i;
             }
             pathLine.setVertices(vertices);
-            pathLine.setDrawOrder(drawOrder);
         }
 
         rangeCircle.setScale(unit.getRange() / unit.getScale());

@@ -35,13 +35,12 @@ public abstract class Shape {
     private float[] mScaleMatrix;   // the scale matrix
     private float[] mMVPMatrixScaled;
 
-    public Shape(float[] vertices, short[] drawOrder, int GL_DRAW_TYPE, float[] color) {
+    public Shape(float[] vertices, int GL_DRAW_TYPE, float[] color) {
         createProgram();
         mScaleMatrix = new float[16];
         mMVPMatrixScaled = new float[16];
 
         setVertices(vertices);
-        setDrawOrder(drawOrder);
         setGL_DRAW_TYPE(GL_DRAW_TYPE);
         setColor(color);
         setScale(1f);
@@ -96,6 +95,16 @@ public abstract class Shape {
         verticesBuffer = bb.asFloatBuffer();
         verticesBuffer.put(vertices);
         verticesBuffer.position(0);
+
+        drawOrder = new short[vertices.length / COORDS_PER_VERTEX];
+        for (int i = 0; i < drawOrder.length; i++) {
+            drawOrder[i] = (short) i;
+        }
+        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * BYTES_PER_SHORT);
+        dlb.order(ByteOrder.nativeOrder());
+        drawOrderBuffer = dlb.asShortBuffer();
+        drawOrderBuffer.put(drawOrder);
+        drawOrderBuffer.position(0);
     }
 
     public void resetVertices(float[] vertices) {
@@ -111,26 +120,6 @@ public abstract class Shape {
 
     public short[] getDrawOrder() {
         return drawOrder;
-    }
-
-    public void setDrawOrder(short[] drawOrder) {
-        this.drawOrder = drawOrder;
-        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * BYTES_PER_SHORT);
-        dlb.order(ByteOrder.nativeOrder());
-        drawOrderBuffer = dlb.asShortBuffer();
-        drawOrderBuffer.put(drawOrder);
-        drawOrderBuffer.position(0);
-    }
-
-    public void resetDrawOrder(short[] drawOrder) {
-        if (drawOrder.length != this.drawOrder.length) {
-            setDrawOrder(drawOrder);
-            return;
-        }
-        this.drawOrder = drawOrder;
-        drawOrderBuffer.clear();
-        drawOrderBuffer.put(drawOrder);
-        drawOrderBuffer.position(0);
     }
 
     public int getGL_DRAW_TYPE() {

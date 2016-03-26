@@ -10,10 +10,9 @@ public class Square extends Shape {
             (float) Math.cos(Math.PI/4 + 2*Math.PI/2), (float) Math.sin(Math.PI/4 + 2*Math.PI/2), 0.0f, // bottom left
             (float) Math.cos(Math.PI/4 + 3*Math.PI/2), (float) Math.sin(Math.PI/4 + 3*Math.PI/2), 0.0f, // bottom right
     };
-    private static short drawOrder[] = {0, 1, 2, 3};
 
     public Square(float[] color) {
-        super(vertices, drawOrder, GLES20.GL_TRIANGLE_FAN, color);
+        super(vertices, GLES20.GL_TRIANGLE_FAN, color);
     }
 
     @Override
