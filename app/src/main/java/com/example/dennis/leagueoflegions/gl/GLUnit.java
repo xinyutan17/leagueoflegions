@@ -9,6 +9,7 @@ import com.example.dennis.leagueoflegions.model.Unit;
 
 public abstract class GLUnit extends GLObject {
     private Line pathLine;
+    private float[] pathVertices;
     private EmptyCircle rangeCircle;
 
     public GLUnit(Unit unit) {
@@ -41,10 +42,9 @@ public abstract class GLUnit extends GLObject {
 
     @Override
     public void draw(float[] mVPMatrix) {
+        super.draw(mVPMatrix);
         if (!((Unit) getGameObject()).getRemainingPath().isEmpty())
             pathLine.draw(mVPMatrix);
-
-        float[] mMVPMatrix = getMVPMatrix(mVPMatrix);
-        rangeCircle.draw(mMVPMatrix);
+        rangeCircle.draw(getMVPMatrix());
     }
 }

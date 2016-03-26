@@ -21,8 +21,6 @@ public class GLBase extends GLUnit {
     @Override
     public void draw(float[] mVPMatrix) {
         super.draw(mVPMatrix);
-
-        float[] mMVPMatrix = getMVPMatrix(mVPMatrix);
-        bodySquare.draw(mMVPMatrix);
+        bodySquare.draw(getMVPMatrix());
     }
 }

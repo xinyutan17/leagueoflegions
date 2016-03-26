@@ -1,10 +1,8 @@
 package com.example.dennis.leagueoflegions.gl;
 
 import android.opengl.Matrix;
-import android.util.Log;
 
 import com.example.dennis.leagueoflegions.model.GameObject;
-import com.example.dennis.leagueoflegions.view.GameActivity;
 
 public abstract class GLObject {
     private static final String DEBUG_TAG = "GLObject";
@@ -22,7 +20,11 @@ public abstract class GLObject {
         return gameObject;
     }
 
-    public float[] getMVPMatrix(float[] mVPMatrix) {
+    public float[] getMVPMatrix() {
+        return mMVPMatrix;
+    }
+
+    public void updateMVPMatrix(float[] mVPMatrix) {
         float x = gameObject.getX();
         float y = gameObject.getY();
         float scale = gameObject.getScale();
@@ -34,16 +36,11 @@ public abstract class GLObject {
         Matrix.rotateM(mModelMatrix, 0, rotation, 0f, 0f, 1f);
 
         Matrix.multiplyMM(mMVPMatrix, 0, mVPMatrix, 0, mModelMatrix, 0);
-
-        if (GameActivity.DEBUGGING) {
-            Log.d(DEBUG_TAG, gameObject.toString());
-            GLUtility.logMatrix("mModelMatrix", mModelMatrix);
-            GLUtility.logMatrix("mMVPMatrix", mMVPMatrix);
-        }
-
-        return mMVPMatrix;
     }
 
-    public abstract void draw(float[] mVPMatrix);
     public abstract void tick();
+
+    public void draw(float[] mVPMatrix) {
+        updateMVPMatrix(mVPMatrix);
+    }
 }
