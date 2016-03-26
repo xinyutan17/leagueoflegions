@@ -5,13 +5,11 @@ import com.example.dennis.leagueoflegions.gl.shape.AnimatedCircle;
 import com.example.dennis.leagueoflegions.model.unit.Army;
 
 public class GLArmy extends GLUnit {
-    private static final float BODY_RADIUS = 1f;
-
     private AnimatedCircle bodyAnimatedCircle;
 
     public GLArmy(Army army) {
         super(army);
-        bodyAnimatedCircle = new AnimatedCircle(army.getColor(), BODY_RADIUS);
+        bodyAnimatedCircle = new AnimatedCircle(army.getColor());
     }
 
     @Override

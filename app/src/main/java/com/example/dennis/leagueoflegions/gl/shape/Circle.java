@@ -7,16 +7,16 @@ public class Circle extends Shape {
     public static final int TOTAL_VERTICES = NUMBER_VERTICES + 2;          // the number of vertices used to draw the circle
     public static final double DELTA_ANGLE = 2*Math.PI/NUMBER_VERTICES;    // the angle of the circle that each triangle fills
 
-    private float[] radii;              // the radii for the vertices
+    private float[] radii;      // the radii for the vertices
 
-    public Circle(float[] color, float radius) {
+    public Circle(float[] color) {
         super(color);
 
         radii = new float[NUMBER_VERTICES];
         float[] vertices = new float[COORDS_PER_VERTEX * TOTAL_VERTICES];
         vertices[0] = vertices[1] = vertices[2] = 0f;
         for (int i = 0; i < NUMBER_VERTICES; i++) {
-            radii[i] = radius;
+            radii[i] = 1f;
             vertices[3*(i+1)+0] = (float) (radii[i]*Math.cos(i*DELTA_ANGLE));
             vertices[3*(i+1)+1] = (float) (radii[i]*Math.sin(i*DELTA_ANGLE));
             vertices[3*(i+1)+2] = 0f;

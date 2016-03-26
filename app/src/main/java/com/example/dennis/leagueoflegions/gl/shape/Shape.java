@@ -1,6 +1,7 @@
 package com.example.dennis.leagueoflegions.gl.shape;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.example.dennis.leagueoflegions.gl.GLUtility;
@@ -30,21 +31,32 @@ public abstract class Shape {
     private int GL_DRAW_TYPE;       // GL_TRIANGLES, GL_TRIANGLE_FAN, GL_TRIANGLE_STRIP
 
     private float[] color;          // the color of the Shape (rgba)
+    private float scale;            // the scale of the Shape (scaling before model's scaling)
+    private float[] mScaleMatrix;   // the scale matrix
+    private float[] mMVPMatrixScaled;
 
     public Shape(float[] vertices, short[] drawOrder, int GL_DRAW_TYPE, float[] color) {
         createProgram();
+        mScaleMatrix = new float[16];
+        mMVPMatrixScaled = new float[16];
+
         setVertices(vertices);
         setDrawOrder(drawOrder);
         setGL_DRAW_TYPE(GL_DRAW_TYPE);
         setColor(color);
+        setScale(1f);
     }
 
     public Shape(float[] color) {
         createProgram();
+        mScaleMatrix = new float[16];
+        mMVPMatrixScaled = new float[16];
+
         vertices = null;
         drawOrder = null;
         GL_DRAW_TYPE = -1;
         setColor(color);
+        setScale(1f);
     }
 
     public String getVertexShaderCode() {
@@ -137,11 +149,24 @@ public abstract class Shape {
         this.color = color;
     }
 
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+
+        Matrix.setIdentityM(mScaleMatrix, 0);
+        Matrix.scaleM(mScaleMatrix, 0, scale, scale, 1f);
+    }
+
     public void tick() {
         // Override to do something at each game tick
     }
 
     public void draw(float[] mMVPMatrix) {
+        Matrix.multiplyMM(mMVPMatrixScaled, 0, mMVPMatrix, 0, mScaleMatrix, 0);
+
         if (vertices == null || drawOrder == null || GL_DRAW_TYPE == -1) {
             Log.e(DEBUG_TAG,  "failed to draw shape " + toString() + ": null vertices, drawOrder, or GL_DRAW_TYPE");
             return;
@@ -158,7 +183,7 @@ public abstract class Shape {
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         GLUtility.checkGlError("glGetUniformLocation");
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrixScaled, 0);
         GLUtility.checkGlError("glUniformMatrix4fv");
 
         GLES20.glLineWidth(2f); // TODO: only do this when drawing lines

@@ -54,7 +54,7 @@ public class Base extends Unit {
         float gameTime = getPlayer().getGame().getTime();
         if (gameTime - lastSpawnTime > spawnRate) {
             Player selfPlayer = getPlayer();
-            double radius = (MIN_SPAWN_DIST + Math.random()*(MAX_SPAWN_DIST - MIN_SPAWN_DIST)) * getScale();
+            double radius = (MIN_SPAWN_DIST + Math.random()*(MAX_SPAWN_DIST - MIN_SPAWN_DIST)) * getScale() * getSize();
             double angle = Math.random() * 2*Math.PI;
             float xOffset = (float)(radius * Math.cos(angle));
             float yOffset = (float)(radius * Math.sin(angle));

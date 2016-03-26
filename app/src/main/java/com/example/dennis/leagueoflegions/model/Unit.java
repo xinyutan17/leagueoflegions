@@ -83,16 +83,6 @@ public abstract class Unit extends GameObject {
         this.color = color;
     }
 
-    @Override
-    public float getScale() {
-        return super.getScale() * getSize();
-    }
-
-    @Override
-    public void setScale(float scale) {
-        // do nothing
-    }
-
     // Attributes
     public float getSize() {
         return size;
