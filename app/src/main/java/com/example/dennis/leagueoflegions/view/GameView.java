@@ -1,8 +1,6 @@
 package com.example.dennis.leagueoflegions.view;
 
 import android.content.Context;
-import android.graphics.Path;
-import android.graphics.PathMeasure;
 import android.opengl.GLSurfaceView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -25,12 +23,9 @@ public class GameView extends GLSurfaceView {
     private final GestureDetector mGestureDetector;
     private final ScaleGestureDetector mScaleGestureDetector;
 
-    private Unit selectedUnit;
-    private Path path;
-    private float pathX, pathY;
-    private boolean pathing;
+    private Unit pathingUnit;
 
-    public GameView(Context context, Game game){
+    public GameView(Context context, Game game) {
         super(context);
         setEGLContextClientVersion(2);
 
@@ -76,74 +71,43 @@ public class GameView extends GLSurfaceView {
             }
         });
 
-        selectedUnit = null;
-        path = new Path();
-        pathX = pathY = 0;
-        pathing = false;
+        pathingUnit = null;
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
+    public boolean onTouchEvent(MotionEvent event) {
         float[] screenCoors = mRenderer.getScreenCoors(event.getX(), event.getY());
         float[] worldCoors = mRenderer.screenToWorld(screenCoors);
         float x = worldCoors[0];
         float y = worldCoors[1];
 
         ArrayList<Unit> selectedUnits = game.getUnitsWithinRadius(x, y, mRenderer.getFieldOfViewY()/50f * TOUCH_SELECT_TOLERANCE);
-
-        if (pathing) {
-            switch(event.getAction()) {
-                case MotionEvent.ACTION_MOVE:
-                    if (Math.abs(x - pathX) >= TOUCH_MOVE_TOLERANCE || Math.abs(y - pathY) >= TOUCH_MOVE_TOLERANCE) {
-                        path.quadTo(pathX, pathY, (x + pathX) / 2, (y + pathY) / 2);
-                        pathX = x;
-                        pathY = y;
-                        selectedUnit.updatePath(path);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    path.lineTo(pathX, pathY);
-                    selectedUnit.updatePath(path);
-
-                    path.reset();
-                    pathX = pathY = 0;
-                    selectedUnit = null;
-                    pathing = false;
-                    break;
-                default:
-                    break;
-            }
-            return true;
-        }
-
-        if (!selectedUnits.isEmpty()) {
+//        if (!selectedUnits.isEmpty()) {
 //            Log.d(DEBUG_TAG, "SELECTED UNITS");
 //            for (Unit unit : selectedUnits) {
 //                Log.d(DEBUG_TAG, unit.toString());
 //            }
+//        }
 
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                selectedUnit = selectedUnits.get(0);
-                pathing = true;
-                selectedUnit.setPathing(true);
-
-                path.reset();
-                path.moveTo(selectedUnit.getX(), selectedUnit.getY());
-                PathMeasure pm = new PathMeasure(path, false);
-                pathX = selectedUnit.getX();
-                pathY = selectedUnit.getY();
-                selectedUnit.setPath(path);
-
-                return true;
+        if (pathingUnit != null) {
+            switch(event.getAction()) {
+                case MotionEvent.ACTION_MOVE:
+                    float[] pathEnd = pathingUnit.getPathEnd();
+                    if (Math.abs(x - pathEnd[0]) >= TOUCH_MOVE_TOLERANCE || Math.abs(y - pathEnd[1]) >= TOUCH_MOVE_TOLERANCE) {
+                        pathingUnit.updatePathing(x, y);
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    pathingUnit.endPathing(x, y);
+                    pathingUnit = null;
+                    break;
             }
-        }
-
-        if (selectedUnits.isEmpty()) {
+        } else if (!selectedUnits.isEmpty() && event.getAction() == MotionEvent.ACTION_DOWN) {
+                pathingUnit = selectedUnits.get(0);
+                pathingUnit.beginPathing();
+        } else if (selectedUnits.isEmpty()) {
             mScaleGestureDetector.onTouchEvent(event);
             mGestureDetector.onTouchEvent(event);
-
-            return true;
         }
 
         return true;

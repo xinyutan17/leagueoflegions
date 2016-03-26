@@ -28,11 +28,11 @@ public abstract class Unit extends GameObject {
     private float speed_mult;
 
     // Path
+    private boolean pathing;    // whether or not user is pathing this unit
     private Path path;          // the unit's current path
     private PathMeasure pm;     // path measure handler
     private float pathDist;     // the unit's path distance traveled
     private Path remainingPath; // the unit's remaining path
-    private boolean pathing;    // whether or not user is pathing this unit
 
     public Unit(Player player, float x, float y, float scale, float rotation)
     {
@@ -57,11 +57,11 @@ public abstract class Unit extends GameObject {
         range_mult = 1f;
 
         // Path
+        pathing = false;
         path = new Path();
         pm = new PathMeasure();
         pathDist = 0f;
         remainingPath = new Path();
-        pathing = false;
     }
 
     // Unit
@@ -185,26 +185,32 @@ public abstract class Unit extends GameObject {
         return remainingPath;
     }
 
-    public void setPath(Path path) {
-        this.path.set(path);
+    public float[] getPathEnd() {
+        if (pm.getLength() == 0) {
+            return new float[] {getX(), getY()};
+        }
+        float[] xy = new float[2];
+        pm.getPosTan(pm.getLength(), xy, null);
+        return xy;
+    }
+
+    public void beginPathing() {
+        pathing = true;
+        path.reset();
+        path.moveTo(getX(), getY());
         pm.setPath(path, false);
-        pathDist = 0f;
-        remainingPath.set(path);
     }
 
-    public void updatePath(Path path) {
-        this.path.set(path);
+    public void updatePathing(float x, float y) {
+        float[] pathEnd = getPathEnd();
+        path.quadTo((pathEnd[0]+x)/2, (pathEnd[1]+y)/2, x, y);
         pm.setPath(path, false);
-        // path is being lengthened:
-        // don't change pathDist or remainingPath
     }
 
-    public void setPathing(boolean pathing) {
-        this.pathing = pathing;
-    }
-
-    public boolean getPathing() {
-        return pathing;
+    public void endPathing(float x, float y) {
+        pathing = false;
+        path.lineTo(x, y);
+        pm.setPath(path, false);
     }
 
     @Override
@@ -223,13 +229,8 @@ public abstract class Unit extends GameObject {
             }
             float[] pathXY = new float[2];
             pm.getPosTan(pathDist, pathXY, null);
-
-            float x = getX();
-            float y = getY();
-            float dx = (int)(pathXY[0] - x);
-            float dy = (int)(pathXY[1] - y);
-            setX(x + dx);
-            setY(y + dy);
+            setX(pathXY[0]);
+            setY(pathXY[1]);
 
             remainingPath.reset();
             pm.getSegment(pathDist, pm.getLength(), remainingPath, true);
@@ -239,7 +240,6 @@ public abstract class Unit extends GameObject {
                 pm.setPath(null, false);
                 pathDist = 0f;
                 remainingPath.reset();
-                pathing = false;
             }
         }
     }
