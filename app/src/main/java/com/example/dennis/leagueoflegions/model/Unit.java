@@ -17,18 +17,26 @@ public abstract class Unit extends GameObject {
     private boolean destroyed;
 
     // Attributes
-    private float size;     // the unit's size, i.e. number of individuals
-    private float health;   // the health of each individual
-    private float damage;   // the damage per second of each individual
-    private float range;    // the unit's range
-    private float speed;    // the unit's speed
+    // size = sizeMult * baseSize
+    // scale = super.scale * size;
+    // health = healthMult * baseHealth * size
+    // damage = damageMult * baseDamage * size
+    // range = rangeMult * baseRange + scale
+    // speed = speedMult * baseSpeed / Math.sqrt(size)
 
-    // Multipliers (set by Terrain elements)
-    private float size_mult;
-    private float health_mult;
-    private float damage_mult;
-    private float range_mult;
-    private float speed_mult;
+    // Attribute base values
+    private float baseSize;     // the unit's baseSize, i.e. number of individuals
+    private float baseHealth;   // the baseHealth of each individual
+    private float baseDamage;   // the baseDamage per second of each individual
+    private float baseRange;    // the unit's baseRange
+    private float baseSpeed;    // the unit's baseSpeed
+
+    // Attribute multipliers (set by Terrain elements)
+    private float sizeMult;
+    private float healthMult;
+    private float damageMult;
+    private float rangeMult;
+    private float speedMult;
 
     // Path
     private boolean pathing;    // whether or not user is pathing this unit
@@ -47,18 +55,18 @@ public abstract class Unit extends GameObject {
         destroyed = false;
 
         // Attributes
-        size = 1f;
-        speed = 1f;
-        health = 1f;
-        damage = 1f;
-        range = 1f;
+        baseSize = 1f;
+        baseSpeed = 1f;
+        baseHealth = 1f;
+        baseDamage = 1f;
+        baseRange = 1f;
 
         // Modifiers
-        size_mult = 1f;
-        speed_mult = 1f;
-        health_mult = 1f;
-        damage_mult = 1f;
-        range_mult = 1f;
+        sizeMult = 1f;
+        speedMult = 1f;
+        healthMult = 1f;
+        damageMult = 1f;
+        rangeMult = 1f;
 
         // Path
         pathing = false;
@@ -96,6 +104,10 @@ public abstract class Unit extends GameObject {
         destroyed = true;
     }
 
+    public float getBaseScale() {
+        return super.getScale();
+    }
+
     @Override
     public float getScale() {
         return super.getScale() * getSize();
@@ -108,85 +120,105 @@ public abstract class Unit extends GameObject {
 
     // Attributes
     public float getSize() {
-        return size;
+        return sizeMult * baseSize;
     }
 
-    public void setSize(float size) {
-        this.size = size;
+    public float getBaseSize() {
+        return baseSize;
+    }
+
+    public void setBaseSize(float size) {
+        this.baseSize = size;
     }
 
     public float getSpeed() {
-        return speed;
+        return speedMult * baseSpeed / (float) Math.sqrt(getSize());
     }
 
-    public void setSpeed(float speed) {
-        this.speed = speed;
+    public float getBaseSpeed() {
+        return baseSpeed;
+    }
+
+    public void setBaseSpeed(float speed) {
+        this.baseSpeed = speed;
     }
 
     public float getHealth() {
-        return health;
+        return healthMult * baseHealth * getSize();
     }
 
-    public void setHealth(float health) {
-        this.health = health;
+    public float getBaseHealth() {
+        return baseHealth;
+    }
+
+    public void setBaseHealth(float health) {
+        this.baseHealth = health;
     }
 
     public float getDamage() {
-        return damage;
+        return damageMult * baseDamage * getSize();
     }
 
-    public void setDamage(float damage) {
-        this.damage = damage;
+    public float getBaseDamage() {
+        return baseDamage;
+    }
+
+    public void setBaseDamage(float damage) {
+        this.baseDamage = damage;
     }
 
     public float getRange() {
-        return range;
+        return rangeMult * baseRange + getScale();
     }
 
-    public void setRange(float range) {
-        this.range = range;
+    public float getBaseRange() {
+        return baseRange;
+    }
+
+    public void setBaseRange(float range) {
+        this.baseRange = range;
     }
 
     // Modifiers
 
     public float getSizeMult() {
-        return size_mult;
+        return sizeMult;
     }
 
     public void setSizeMult(float size_mult) {
-        this.size_mult = size_mult;
+        this.sizeMult = size_mult;
     }
 
     public float getSpeedMult() {
-        return speed_mult;
+        return speedMult;
     }
 
     public void setSpeedMult(float speed_mult) {
-        this.speed_mult = speed_mult;
+        this.speedMult = speed_mult;
     }
 
     public float getHealthMult() {
-        return health_mult;
+        return healthMult;
     }
 
     public void setHealthMult(float health_mult) {
-        this.health_mult = health_mult;
+        this.healthMult = health_mult;
     }
 
     public float getDamageMult() {
-        return damage_mult;
+        return damageMult;
     }
 
     public void setDamageMult(float damage_mult) {
-        this.damage_mult = damage_mult;
+        this.damageMult = damage_mult;
     }
 
     public float getRangeMult() {
-        return range_mult;
+        return rangeMult;
     }
 
     public void setRangeMult(float range_mult) {
-        this.range_mult = range_mult;
+        this.rangeMult = range_mult;
     }
 
     // Path
@@ -233,14 +265,14 @@ public abstract class Unit extends GameObject {
     @Override
     public void tick(){
         Game game = getPlayer().getGame();
-        ArrayList<Unit> units = game.getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), range);
+        ArrayList<Unit> units = game.getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), getRange());
         float[] randomLottery = randomLottery(units.size());
         for (int i = 0; i < units.size(); i++) {
-            sendDamage(units.get(i), randomLottery[i] * game.getElapsedTime() * getSize() * damage);
+            sendDamage(units.get(i), randomLottery[i] * game.getElapsedTime() * getDamage());
         }
 
         if (!path.isEmpty() && pm.getLength() > 0) {
-            pathDist += speed;
+            pathDist += baseSpeed;
             if (pathDist > pm.getLength()) {
                 pathDist = pm.getLength();
             }
@@ -261,7 +293,7 @@ public abstract class Unit extends GameObject {
         }
 
         if (!destroyed) {
-            ArrayList<Unit> friendlyUnits = game.getFriendlyUnitsWithinRadius(player, getX(), getY(), range);
+            ArrayList<Unit> friendlyUnits = game.getFriendlyUnitsWithinRadius(player, getX(), getY(), baseRange);
             for (Unit unit : friendlyUnits) {
                 merge(unit);
             }
@@ -273,8 +305,8 @@ public abstract class Unit extends GameObject {
     }
 
     public void receiveDamage(float damage) {
-        size -= damage / (health);
-        if (size <= 0) {
+        baseSize -= damage / (healthMult * baseHealth);
+        if (baseSize <= 0) {
             destroy();
         }
     }
@@ -317,7 +349,7 @@ public abstract class Unit extends GameObject {
 
         setX((getX() + other.getX()) / 2);
         setY((getY() + other.getY()) / 2);
-        size = size + other.getSize();
+        baseSize = baseSize + other.getSize();
 
         other.destroy();
     }

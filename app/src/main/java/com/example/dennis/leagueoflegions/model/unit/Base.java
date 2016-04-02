@@ -23,11 +23,11 @@ public class Base extends Unit {
 
     public Base(Player player, float x, float y) {
         super(player, x, y, DEFAULT_SCALE, DEFAULT_ROTATION);
-        setSize(DEFAULT_SIZE);
-        setHealth(DEFAULT_HEALTH);
-        setDamage(DEFAULT_DAMAGE);
-        setRange(DEFAULT_RANGE);
-        setSpeed(DEFAULT_SPEED);
+        setBaseSize(DEFAULT_SIZE);
+        setBaseHealth(DEFAULT_HEALTH);
+        setBaseDamage(DEFAULT_DAMAGE);
+        setBaseRange(DEFAULT_RANGE);
+        setBaseSpeed(DEFAULT_SPEED);
 
         spawnRate = DEFAULT_SPAWN_RATE;
         lastSpawnTime = player.getGame().getTime();
