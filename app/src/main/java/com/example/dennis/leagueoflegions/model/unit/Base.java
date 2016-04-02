@@ -11,7 +11,7 @@ public class Base extends Unit {
     private static final float DEFAULT_SIZE = 1f;
     private static final float DEFAULT_HEALTH = 10;
     private static final float DEFAULT_DAMAGE = 1f;
-    private static final float DEFAULT_RANGE = 20f;
+    private static final float DEFAULT_RANGE = 50f;
     private static final float DEFAULT_SPEED = 3f;
 
     private static final float DEFAULT_SPAWN_RATE = 3.0f;
@@ -34,7 +34,7 @@ public class Base extends Unit {
     }
 
     @Override
-    public UnitType getType()
+    public UnitType getUnitType()
     {
         return UNIT_TYPE;
     }

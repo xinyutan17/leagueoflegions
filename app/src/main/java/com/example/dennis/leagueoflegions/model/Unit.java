@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public abstract class Unit extends GameObject {
+    private static final String DEBUG_TAG = "Unit";
+
     public enum UnitType {BASE, ARMY}
 
     // Unit
     private Player player;  // the player that owns this unit
     private float[] color;  // this unit's color
+    private boolean destroyed;
 
     // Attributes
     private float size;     // the unit's size, i.e. number of individuals
@@ -41,6 +44,7 @@ public abstract class Unit extends GameObject {
         // Unit
         this.player = player;
         this.color = player.getColor();
+        destroyed = false;
 
         // Attributes
         size = 1f;
@@ -65,7 +69,7 @@ public abstract class Unit extends GameObject {
     }
 
     // Unit
-    public abstract UnitType getType();
+    public abstract UnitType getUnitType();
 
     public Player getPlayer() {
         return player;
@@ -81,6 +85,15 @@ public abstract class Unit extends GameObject {
 
     public void setColor(float[] color) {
         this.color = color;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public void destroy() {
+        getPlayer().removeUnit(this);
+        destroyed = true;
     }
 
     @Override
@@ -194,6 +207,10 @@ public abstract class Unit extends GameObject {
         return xy;
     }
 
+    public boolean isPathing() {
+        return pathing;
+    }
+
     public void beginPathing() {
         pathing = true;
         path.reset();
@@ -203,7 +220,7 @@ public abstract class Unit extends GameObject {
 
     public void updatePathing(float x, float y) {
         float[] pathEnd = getPathEnd();
-        path.quadTo((pathEnd[0]+x)/2, (pathEnd[1]+y)/2, x, y);
+        path.quadTo((pathEnd[0] + x) / 2, (pathEnd[1] + y) / 2, x, y);
         pm.setPath(path, false);
     }
 
@@ -242,6 +259,13 @@ public abstract class Unit extends GameObject {
                 remainingPath.reset();
             }
         }
+
+        if (!destroyed) {
+            ArrayList<Unit> friendlyUnits = game.getFriendlyUnitsWithinRadius(player, getX(), getY(), range);
+            for (Unit unit : friendlyUnits) {
+                merge(unit);
+            }
+        }
     }
 
     public void sendDamage(Unit unit, float damage) {
@@ -251,13 +275,13 @@ public abstract class Unit extends GameObject {
     public void receiveDamage(float damage) {
         size -= damage / (health);
         if (size <= 0) {
-            getPlayer().removeUnit(this);
+            destroy();
         }
     }
 
     @Override
     public String toString() {
-        return String.format("%s %s at (%f, %f)", Arrays.toString(getColor()), getType().toString(), getX(), getY());
+        return String.format("%s %s at (%f, %f)", Arrays.toString(getColor()), getUnitType().toString(), getX(), getY());
     }
 
     private float[] randomLottery(int size) {
@@ -272,5 +296,29 @@ public abstract class Unit extends GameObject {
             randomLottery[i] /= randomTotal;
         }
         return randomLottery;
+    }
+
+    public void merge(Unit other) {
+        if (destroyed || other.isDestroyed()) {
+            return;
+        }
+        if (other.equals(this)) {
+            return;
+        }
+        if (!other.getPlayer().equals(player)) {
+            return;
+        }
+        if (!other.getUnitType().equals(getUnitType())) {
+            return;
+        }
+        if (pathing || other.isPathing()) {
+            return;
+        }
+
+        setX((getX() + other.getX()) / 2);
+        setY((getY() + other.getY()) / 2);
+        size = size + other.getSize();
+
+        other.destroy();
     }
 }

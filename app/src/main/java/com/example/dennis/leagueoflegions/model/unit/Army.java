@@ -11,7 +11,7 @@ public class Army extends Unit {
     private static final float DEFAULT_SIZE = 5f;
     private static final float DEFAULT_HEALTH = 1f;
     private static final float DEFAULT_DAMAGE = 0.1f;
-    private static final float DEFAULT_RANGE = 10f;
+    private static final float DEFAULT_RANGE = 30f;
     private static final float DEFAULT_SPEED = 10f;
 
     public Army(Player player, float  x, float y) {
@@ -24,7 +24,7 @@ public class Army extends Unit {
     }
 
     @Override
-    public UnitType getType()
+    public UnitType getUnitType()
     {
         return UNIT_TYPE;
     }

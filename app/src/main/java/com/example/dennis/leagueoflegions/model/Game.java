@@ -104,6 +104,16 @@ public class Game {
         return unitsWithinRadius;
     }
 
+    public ArrayList<Unit> getFriendlyUnitsWithinRadius(Player player, float x, float y, float radius) {
+        ArrayList<Unit> friendlyUnitsWithinRadius = new ArrayList<Unit>();
+        for (Unit unit : getUnitsWithinRadius(x, y, radius)) {
+            if (unit.getPlayer().equals(player)) {
+                friendlyUnitsWithinRadius.add(unit);
+            }
+        }
+        return friendlyUnitsWithinRadius;
+    }
+
     public ArrayList<Unit> getEnemyUnitsWithinRadius(Player player, float x, float y, float radius) {
         ArrayList<Unit> enemyUnitsWithinRadius = new ArrayList<Unit>();
         for (Unit unit : getUnitsWithinRadius(x, y, radius)) {

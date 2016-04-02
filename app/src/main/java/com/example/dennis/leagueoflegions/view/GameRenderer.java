@@ -180,7 +180,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     public void addAllGLUnits(ArrayList<Unit> units) {
         for (Unit unit : units) {
-            switch (unit.getType()) {
+            switch (unit.getUnitType()) {
                 case ARMY:
                     glUnits.add(new GLArmy((Army) unit));
                     break;
@@ -188,7 +188,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                     glUnits.add(new GLBase((Base) unit));
                     break;
                 default:
-                    Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getType());
+                    Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getUnitType());
             }
         }
     }
