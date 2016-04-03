@@ -124,4 +124,23 @@ public class Game {
         }
         return enemyUnitsWithinRadius;
     }
+
+    public Unit getClosestUnit(float x, float y, ArrayList<Unit> units) {
+        if (units.isEmpty()) {
+            return null;
+        }
+        Unit closest = units.get(0);
+        float minDist = Float.POSITIVE_INFINITY;
+        for (Unit unit : units) {
+            float dx = unit.getX() - x;
+            float dy = unit.getY() - y;
+            float s = unit.getScale();
+            float dist = dx*dx + dy*dy - s*s;
+            if (dist < minDist) {
+                minDist = dist;
+                closest = unit;
+            }
+        }
+        return closest;
+    }
 }

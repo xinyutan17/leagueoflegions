@@ -262,6 +262,14 @@ public abstract class Unit extends GameObject {
         pm.setPath(path, false);
     }
 
+    public void resetPathing() {
+        pathing = false;
+        path.reset();
+        pm.setPath(null, false);
+        pathDist = 0f;
+        remainingPath.reset();
+    }
+
     @Override
     public void tick(){
         Game game = getPlayer().getGame();
@@ -285,10 +293,7 @@ public abstract class Unit extends GameObject {
             pm.getSegment(pathDist, pm.getLength(), remainingPath, true);
 
             if (pathDist == pm.getLength() && !pathing) {
-                path.reset();
-                pm.setPath(null, false);
-                pathDist = 0f;
-                remainingPath.reset();
+                resetPathing();
             }
         }
 

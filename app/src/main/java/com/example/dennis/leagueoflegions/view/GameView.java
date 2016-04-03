@@ -10,12 +10,13 @@ import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.Unit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameView extends GLSurfaceView {
     private static final String DEBUG_TAG = "GameView";
 
     private static final int TOUCH_MOVE_TOLERANCE = 5;
-    private static final int TOUCH_SELECT_TOLERANCE = 20;
+    private static final int TOUCH_SELECT_TOLERANCE = 30;
 
     private Game game;
 
@@ -23,7 +24,9 @@ public class GameView extends GLSurfaceView {
     private final GestureDetector mGestureDetector;
     private final ScaleGestureDetector mScaleGestureDetector;
 
-    private Unit pathingUnit;
+    private HashMap<Integer, Unit> pathingUnits;
+    private enum TouchType {NONE, SINGLE_PATHING, MULTI_PATHING, SPLITTING, PANNING, ZOOMING};
+    private TouchType touchType;
 
     public GameView(Context context, Game game) {
         super(context);
@@ -71,45 +74,113 @@ public class GameView extends GLSurfaceView {
             }
         });
 
-        pathingUnit = null;
+        pathingUnits = new HashMap<Integer, Unit>();
+        touchType = TouchType.NONE;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float[] screenCoors = mRenderer.getScreenCoors(event.getX(), event.getY());
-        float[] worldCoors = mRenderer.screenToWorld(screenCoors);
+        int index = event.getActionIndex();
+        float[] worldCoors = mRenderer.screenToWorld(mRenderer.getScreenCoors(event.getX(index), event.getY(index)));
         float x = worldCoors[0];
         float y = worldCoors[1];
-
         ArrayList<Unit> selectedUnits = game.getUnitsWithinRadius(x, y, mRenderer.getFieldOfViewY()/50f * TOUCH_SELECT_TOLERANCE);
-//        if (!selectedUnits.isEmpty()) {
-//            Log.d(DEBUG_TAG, "SELECTED UNITS");
-//            for (Unit unit : selectedUnits) {
-//                Log.d(DEBUG_TAG, unit.toString());
-//            }
-//        }
-
-        if (pathingUnit != null) {
-            switch(event.getAction()) {
-                case MotionEvent.ACTION_MOVE:
-                    float[] pathEnd = pathingUnit.getPathEnd();
-                    if (Math.abs(x - pathEnd[0]) >= TOUCH_MOVE_TOLERANCE || Math.abs(y - pathEnd[1]) >= TOUCH_MOVE_TOLERANCE) {
-                        pathingUnit.updatePathing(x, y);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    pathingUnit.endPathing(x, y);
-                    pathingUnit = null;
-                    break;
-            }
-        } else if (!selectedUnits.isEmpty() && event.getAction() == MotionEvent.ACTION_DOWN) {
-                pathingUnit = selectedUnits.get(0);
-                pathingUnit.beginPathing();
-        } else if (selectedUnits.isEmpty()) {
-            mScaleGestureDetector.onTouchEvent(event);
-            mGestureDetector.onTouchEvent(event);
+        Unit selectedUnit = null;
+        if (!selectedUnits.isEmpty()) {
+            selectedUnit = game.getClosestUnit(x, y, selectedUnits);
         }
 
+        int mActivePointerId = event.getPointerId(index);
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                if (selectedUnit != null) {
+                    touchType = TouchType.SINGLE_PATHING;
+                    selectedUnit.beginPathing();
+                    pathingUnits.put(mActivePointerId, selectedUnit);
+                } else {
+                    touchType = TouchType.PANNING;
+                    mGestureDetector.onTouchEvent(event);
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (selectedUnit != null) {
+                    boolean splitting = false;
+                    for (Unit unit : pathingUnits.values()) {
+                        if (unit.equals(selectedUnit)) {
+                            touchType = TouchType.SPLITTING;
+                            splitting = true;
+                        }
+                    }
+                    if (!splitting) {
+                        touchType = TouchType.MULTI_PATHING;
+                        selectedUnit.beginPathing();
+                        pathingUnits.put(mActivePointerId, selectedUnit);
+                    }
+                } else {
+                    touchType = TouchType.ZOOMING;
+                    mScaleGestureDetector.onTouchEvent(event);
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                switch (touchType) {
+                    case SINGLE_PATHING:
+                    case MULTI_PATHING:
+                        for (int pi : pathingUnits.keySet()) {
+                            int indexi = event.findPointerIndex(pi);
+                            float[] worldCoorsi = mRenderer.screenToWorld(mRenderer.getScreenCoors(event.getX(indexi), event.getY(indexi)));
+                            float xi = worldCoorsi[0];
+                            float yi = worldCoorsi[1];
+                            Unit pathingUnit = pathingUnits.get(pi);
+                            float[] pathEnd = pathingUnit.getPathEnd();
+                            if (Math.abs(xi - pathEnd[0]) >= TOUCH_MOVE_TOLERANCE || Math.abs(yi - pathEnd[1]) >= TOUCH_MOVE_TOLERANCE) {
+                                pathingUnit.updatePathing(xi, yi);
+                            }
+                        }
+                        break;
+                    case SPLITTING:
+                        // TODO
+                        break;
+                    case PANNING:
+                        mGestureDetector.onTouchEvent(event);
+                        break;
+                    case ZOOMING:
+                        mScaleGestureDetector.onTouchEvent(event);
+                        break;
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                switch (touchType) {
+                    case MULTI_PATHING:
+                        Unit pathingUnit = pathingUnits.get(mActivePointerId);
+                        pathingUnit.endPathing(x, y);
+                        pathingUnits.remove(mActivePointerId);
+                        touchType = TouchType.SINGLE_PATHING;
+                        break;
+                    case SPLITTING:
+                        // TODO
+                        touchType = TouchType.NONE;
+                        break;
+                    case ZOOMING:
+                        mScaleGestureDetector.onTouchEvent(event);
+                        touchType = TouchType.NONE;
+                        break;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                switch (touchType) {
+                    case SINGLE_PATHING:
+                        Unit pathingUnit = pathingUnits.get(mActivePointerId);
+                        pathingUnit.endPathing(x, y);
+                        pathingUnits.remove(mActivePointerId);
+                        touchType = TouchType.NONE;
+                        break;
+                    case PANNING:
+                        mGestureDetector.onTouchEvent(event);
+                        touchType = TouchType.NONE;
+                        break;
+                }
+                break;
+        }
         return true;
     }
 }
