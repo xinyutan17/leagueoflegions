@@ -97,7 +97,8 @@ public class Game {
         for (Unit unit : units) {
             float dx = unit.getX() - x;
             float dy = unit.getY() - y;
-            if (dx*dx + dy*dy <= radius*radius) {
+            float s = unit.getScale();
+            if (dx*dx + dy*dy <= radius*radius + s*s) {
                 unitsWithinRadius.add(unit);
             }
         }

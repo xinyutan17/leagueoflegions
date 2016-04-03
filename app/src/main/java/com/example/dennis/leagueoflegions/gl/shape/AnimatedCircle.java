@@ -1,8 +1,8 @@
 package com.example.dennis.leagueoflegions.gl.shape;
 
 public class AnimatedCircle extends Circle {
-    private static final float RADIUS_MIN = 0.75f;       // minimum radius value
-    private static final float RADIUS_MAX = 1.5f;        // maximum radius value
+    private static final float RADIUS_MIN = 0.5f;        // minimum radius value
+    private static final float RADIUS_MAX = 1.0f;        // maximum radius value
     private static final float RADIUS_STEP = 0.05f;      // radius step at each update
 
     private float[] radiiStepDir;       // the direction of the radius step at each update

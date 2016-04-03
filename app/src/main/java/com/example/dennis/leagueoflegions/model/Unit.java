@@ -18,11 +18,11 @@ public abstract class Unit extends GameObject {
 
     // Attributes
     // size = sizeMult * baseSize
-    // scale = super.scale * size;
+    // scale = super.scale * size
     // health = healthMult * baseHealth * size
     // damage = damageMult * baseDamage * size
     // range = rangeMult * baseRange + scale
-    // speed = speedMult * baseSpeed / Math.sqrt(size)
+    // speed = speedMult * baseSpeed / size
 
     // Attribute base values
     private float baseSize;     // the unit's baseSize, i.e. number of individuals
@@ -132,7 +132,7 @@ public abstract class Unit extends GameObject {
     }
 
     public float getSpeed() {
-        return speedMult * baseSpeed / (float) Math.sqrt(getSize());
+        return speedMult * baseSpeed / getSize();
     }
 
     public float getBaseSpeed() {
@@ -239,8 +239,8 @@ public abstract class Unit extends GameObject {
         return xy;
     }
 
-    public boolean isPathing() {
-        return pathing;
+    public boolean hasPath() {
+        return !path.isEmpty() && pm.getLength() > 0;
     }
 
     public void beginPathing() {
@@ -271,7 +271,7 @@ public abstract class Unit extends GameObject {
             sendDamage(units.get(i), randomLottery[i] * game.getElapsedTime() * getDamage());
         }
 
-        if (!path.isEmpty() && pm.getLength() > 0) {
+        if (hasPath()) {
             pathDist += baseSpeed;
             if (pathDist > pm.getLength()) {
                 pathDist = pm.getLength();
@@ -343,9 +343,11 @@ public abstract class Unit extends GameObject {
         if (!other.getUnitType().equals(getUnitType())) {
             return;
         }
-        if (pathing || other.isPathing()) {
+        if (hasPath() || other.hasPath()) {
             return;
         }
+
+//        Log.d(DEBUG_TAG, String.format("Merging %s with %s", toString(), other.toString()));
 
         setX((getX() + other.getX()) / 2);
         setY((getY() + other.getY()) / 2);
