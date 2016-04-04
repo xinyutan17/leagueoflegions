@@ -33,4 +33,14 @@ public class Army extends Unit {
     public void tick() {
         super.tick();
     }
+
+
+    public Army split(float x, float y) {
+        Player player = getPlayer();
+        Army army = new Army(player, x, y);
+        player.addUnit(army);
+        army.setBaseSize(getBaseSize() / 2);
+        this.setBaseSize(getBaseSize() / 2);
+        return army;
+    }
 }

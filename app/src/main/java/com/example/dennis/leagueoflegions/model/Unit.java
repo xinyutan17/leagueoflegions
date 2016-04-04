@@ -272,6 +272,10 @@ public abstract class Unit extends GameObject {
 
     @Override
     public void tick(){
+        if (destroyed) {
+            return;
+        }
+
         Game game = getPlayer().getGame();
         ArrayList<Unit> units = game.getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), getRange());
         float[] randomLottery = randomLottery(units.size());
@@ -297,11 +301,9 @@ public abstract class Unit extends GameObject {
             }
         }
 
-        if (!destroyed) {
-            ArrayList<Unit> friendlyUnits = game.getFriendlyUnitsWithinRadius(player, getX(), getY(), baseRange);
-            for (Unit unit : friendlyUnits) {
-                merge(unit);
-            }
+        ArrayList<Unit> friendlyUnits = game.getFriendlyUnitsWithinRadius(player, getX(), getY(), baseRange);
+        for (Unit unit : friendlyUnits) {
+            merge(unit);
         }
     }
 

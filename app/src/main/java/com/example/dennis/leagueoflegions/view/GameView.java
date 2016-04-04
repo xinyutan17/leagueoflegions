@@ -8,6 +8,7 @@ import android.view.ScaleGestureDetector;
 
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.Unit;
+import com.example.dennis.leagueoflegions.model.unit.Army;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class GameView extends GLSurfaceView {
     private final ScaleGestureDetector mScaleGestureDetector;
 
     private HashMap<Integer, Unit> pathingUnits;
-    private enum TouchType {NONE, SINGLE_PATHING, MULTI_PATHING, SPLITTING, PANNING, ZOOMING};
+    private enum TouchType {NONE, SINGLE_PATHING, MULTI_PATHING, PANNING, ZOOMING};
     private TouchType touchType;
 
     public GameView(Context context, Game game) {
@@ -103,20 +104,21 @@ public class GameView extends GLSurfaceView {
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                if (selectedUnit != null) {
-                    boolean splitting = false;
-                    for (Unit unit : pathingUnits.values()) {
-                        if (unit.equals(selectedUnit)) {
-                            touchType = TouchType.SPLITTING;
-                            splitting = true;
+                if (touchType == TouchType.SINGLE_PATHING && selectedUnit != null) {
+                    if (selectedUnit instanceof Army) {
+                        // If selecting the same army, then split that army
+                        // and begin pathing the newly created half army.
+                        for (Unit unit : pathingUnits.values()) {
+                            if (unit.equals(selectedUnit)) {
+                                selectedUnit = ((Army) unit).split(x, y);
+                                break;
+                            }
                         }
                     }
-                    if (!splitting) {
-                        touchType = TouchType.MULTI_PATHING;
-                        selectedUnit.beginPathing();
-                        pathingUnits.put(mActivePointerId, selectedUnit);
-                    }
-                } else {
+                    touchType = TouchType.MULTI_PATHING;
+                    selectedUnit.beginPathing();
+                    pathingUnits.put(mActivePointerId, selectedUnit);
+                } else if (touchType == TouchType.PANNING){
                     touchType = TouchType.ZOOMING;
                     mScaleGestureDetector.onTouchEvent(event);
                 }
@@ -137,9 +139,6 @@ public class GameView extends GLSurfaceView {
                             }
                         }
                         break;
-                    case SPLITTING:
-                        // TODO
-                        break;
                     case PANNING:
                         mGestureDetector.onTouchEvent(event);
                         break;
@@ -156,13 +155,9 @@ public class GameView extends GLSurfaceView {
                         pathingUnits.remove(mActivePointerId);
                         touchType = TouchType.SINGLE_PATHING;
                         break;
-                    case SPLITTING:
-                        // TODO
-                        touchType = TouchType.NONE;
-                        break;
                     case ZOOMING:
                         mScaleGestureDetector.onTouchEvent(event);
-                        touchType = TouchType.NONE;
+                        touchType = TouchType.PANNING;
                         break;
                 }
                 break;
