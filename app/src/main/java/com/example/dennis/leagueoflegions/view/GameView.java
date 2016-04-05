@@ -26,8 +26,6 @@ public class GameView extends GLSurfaceView {
     private final ScaleGestureDetector mScaleGestureDetector;
 
     private HashMap<Integer, Unit> pathingUnits;
-    private enum TouchType {NONE, SINGLE_PATHING, MULTI_PATHING, PANNING, ZOOMING};
-    private TouchType touchType;
 
     public GameView(Context context, Game game) {
         super(context);
@@ -76,105 +74,78 @@ public class GameView extends GLSurfaceView {
         });
 
         pathingUnits = new HashMap<Integer, Unit>();
-        touchType = TouchType.NONE;
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int index = event.getActionIndex();
-        float[] worldCoors = mRenderer.screenToWorld(mRenderer.getScreenCoors(event.getX(index), event.getY(index)));
+    public boolean onTouchEvent(MotionEvent e) {
+        /**
+         * Select unit -> single-pathing
+         * Don't select unit -> panning
+         * Select unit then select unit -> multi-pathing
+         * Select unit then don't select unit -> zooming if non-unit pointer, pathing if unit pointer
+         * Don't select unit then don't select unit -> zooming
+         * Don't select unit then select unit -> zooming if non-unit pointer, pathing if unit pointer
+         */
+        if (e.getActionMasked() == MotionEvent.ACTION_MOVE) {
+            if (!pathingUnits.isEmpty()) {
+                for (int pi : pathingUnits.keySet()) {
+                    int indexi = e.findPointerIndex(pi);
+                    float[] worldCoorsi = mRenderer.screenToWorld(mRenderer.getScreenCoors(e.getX(indexi), e.getY(indexi)));
+                    float xi = worldCoorsi[0];
+                    float yi = worldCoorsi[1];
+
+                    Unit pathingUnit = pathingUnits.get(pi);
+                    float[] pathEnd = pathingUnit.getPathEnd();
+                    if (Math.abs(xi - pathEnd[0]) >= TOUCH_MOVE_TOLERANCE || Math.abs(yi - pathEnd[1]) >= TOUCH_MOVE_TOLERANCE) {
+                        pathingUnit.updatePathing(xi, yi);
+                    }
+                }
+            } else {
+                if (e.getPointerCount() == 1) {
+                    mGestureDetector.onTouchEvent(e);
+                } else {
+                    mScaleGestureDetector.onTouchEvent(e);
+                }
+            }
+            return true;
+        }
+
+        int index = e.getActionIndex();
+        int pointerId = e.getPointerId(index);
+        float[] worldCoors = mRenderer.screenToWorld(mRenderer.getScreenCoors(e.getX(index), e.getY(index)));
         float x = worldCoors[0];
         float y = worldCoors[1];
-        ArrayList<Unit> selectedUnits = game.getUnitsWithinRadius(x, y, mRenderer.getFieldOfViewY()/50f * TOUCH_SELECT_TOLERANCE);
+        ArrayList<Unit> selectedUnits = game.getUnitsWithinRadius(x, y, mRenderer.getFieldOfViewY() / 50f * TOUCH_SELECT_TOLERANCE);
         Unit selectedUnit = null;
         if (!selectedUnits.isEmpty()) {
             selectedUnit = game.getClosestUnit(x, y, selectedUnits);
         }
 
-        int mActivePointerId = event.getPointerId(index);
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
-                if (selectedUnit != null) {
-                    touchType = TouchType.SINGLE_PATHING;
-                    selectedUnit.beginPathing();
-                    pathingUnits.put(mActivePointerId, selectedUnit);
-                } else {
-                    touchType = TouchType.PANNING;
-                    mGestureDetector.onTouchEvent(event);
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                if (touchType == TouchType.SINGLE_PATHING && selectedUnit != null) {
-                    if (selectedUnit instanceof Army) {
-                        // If selecting the same army, then split that army
-                        // and begin pathing the newly created half army.
-                        for (Unit unit : pathingUnits.values()) {
-                            if (unit.equals(selectedUnit)) {
-                                selectedUnit = ((Army) unit).split(x, y);
-                                break;
-                            }
-                        }
+        if (pathingUnits.keySet().contains(pointerId)) {
+            // pointer associated with pathing unit
+            // (must be ACTION_UP or ACTION_POINTER_UP, b/c ACTION_MOVE handled above)
+            Unit pathingUnit = pathingUnits.get(pointerId);
+            pathingUnit.endPathing(x, y);
+            pathingUnits.remove(pointerId);
+        } else if (selectedUnit != null) {
+            // pointer selected new unit
+            if (selectedUnit instanceof Army) {
+                // test if splitting
+                for (Unit unit : pathingUnits.values()) {
+                    if (unit.equals(selectedUnit)) {
+                        selectedUnit = ((Army) selectedUnit).split(x, y);
                     }
-                    touchType = TouchType.MULTI_PATHING;
-                    selectedUnit.beginPathing();
-                    pathingUnits.put(mActivePointerId, selectedUnit);
-                } else if (touchType == TouchType.PANNING){
-                    touchType = TouchType.ZOOMING;
-                    mScaleGestureDetector.onTouchEvent(event);
                 }
-                break;
-            case MotionEvent.ACTION_MOVE:
-                switch (touchType) {
-                    case SINGLE_PATHING:
-                    case MULTI_PATHING:
-                        for (int pi : pathingUnits.keySet()) {
-                            int indexi = event.findPointerIndex(pi);
-                            float[] worldCoorsi = mRenderer.screenToWorld(mRenderer.getScreenCoors(event.getX(indexi), event.getY(indexi)));
-                            float xi = worldCoorsi[0];
-                            float yi = worldCoorsi[1];
-                            Unit pathingUnit = pathingUnits.get(pi);
-                            float[] pathEnd = pathingUnit.getPathEnd();
-                            if (Math.abs(xi - pathEnd[0]) >= TOUCH_MOVE_TOLERANCE || Math.abs(yi - pathEnd[1]) >= TOUCH_MOVE_TOLERANCE) {
-                                pathingUnit.updatePathing(xi, yi);
-                            }
-                        }
-                        break;
-                    case PANNING:
-                        mGestureDetector.onTouchEvent(event);
-                        break;
-                    case ZOOMING:
-                        mScaleGestureDetector.onTouchEvent(event);
-                        break;
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                switch (touchType) {
-                    case MULTI_PATHING:
-                        Unit pathingUnit = pathingUnits.get(mActivePointerId);
-                        pathingUnit.endPathing(x, y);
-                        pathingUnits.remove(mActivePointerId);
-                        touchType = TouchType.SINGLE_PATHING;
-                        break;
-                    case ZOOMING:
-                        mScaleGestureDetector.onTouchEvent(event);
-                        touchType = TouchType.PANNING;
-                        break;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                switch (touchType) {
-                    case SINGLE_PATHING:
-                        Unit pathingUnit = pathingUnits.get(mActivePointerId);
-                        pathingUnit.endPathing(x, y);
-                        pathingUnits.remove(mActivePointerId);
-                        touchType = TouchType.NONE;
-                        break;
-                    case PANNING:
-                        mGestureDetector.onTouchEvent(event);
-                        touchType = TouchType.NONE;
-                        break;
-                }
-                break;
+            }
+            selectedUnit.beginPathing();
+            pathingUnits.put(pointerId, selectedUnit);
+        } else {
+            // pointer did not select unit
+            if (e.getPointerCount() == 1) {
+                mGestureDetector.onTouchEvent(e);
+            } else {
+                mScaleGestureDetector.onTouchEvent(e);
+            }
         }
         return true;
     }
