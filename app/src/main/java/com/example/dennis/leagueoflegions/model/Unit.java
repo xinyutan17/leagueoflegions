@@ -243,11 +243,13 @@ public abstract class Unit extends GameObject {
         return !path.isEmpty() && pm.getLength() > 0;
     }
 
-    public void beginPathing() {
+    public void beginPathing(float x, float y) {
         pathing = true;
         path.reset();
         path.moveTo(getX(), getY());
         pm.setPath(path, false);
+
+        updatePathing(x, y);
     }
 
     public void updatePathing(float x, float y) {
@@ -257,9 +259,8 @@ public abstract class Unit extends GameObject {
     }
 
     public void endPathing(float x, float y) {
+        updatePathing(x, y);
         pathing = false;
-        path.lineTo(x, y);
-        pm.setPath(path, false);
     }
 
     public void resetPathing() {

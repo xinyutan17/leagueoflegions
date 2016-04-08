@@ -22,7 +22,6 @@ import android.util.Log;
 
 import com.example.dennis.leagueoflegions.gl.GLTerrain;
 import com.example.dennis.leagueoflegions.gl.GLUnit;
-import com.example.dennis.leagueoflegions.gl.GLUtility;
 import com.example.dennis.leagueoflegions.gl.unit.GLArcher;
 import com.example.dennis.leagueoflegions.gl.unit.GLBase;
 import com.example.dennis.leagueoflegions.gl.unit.GLSoldier;
@@ -83,7 +82,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClearColor(1f, 1f, 1f, 1f);
 
         viewX = 0f;
         viewY = 0f;
@@ -106,7 +105,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
         // Setup view-projection matrix
         Matrix.perspectiveM(mProjectionMatrix, 0, fieldOfViewY, viewportRatio, -1, 1);
-//        Matrix.orthoM(mProjectionMatrix, 0, -1, 1, -viewportRatio, viewportRatio, -1, 1);
         Matrix.setLookAtM(mViewMatrix, 0, 0, 0, CAMERA_DISTANCE, 0, 0, 0f, 0f, 1.0f, 0.0f);
         Matrix.translateM(mViewMatrix, 0, -viewX, -viewY, 0f);
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
@@ -114,11 +112,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        if (GameActivity.DEBUGGING) {
-            if (game.getTime() > 1f) {
-                return;
-            }
-        }
         long now = System.currentTimeMillis();
         if (now - mLastTime < 1000.0/FPS) {
             return;
@@ -153,12 +146,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         // Draw background
         GLES20.glClearColor(1f, 1f, 1f, 1f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-        if (GameActivity.DEBUGGING) {
-            Log.d(DEBUG_TAG, "@@@@@@@@@@@@ Begin draw. @@@@@@@@@@@@");
-            GLUtility.logMatrix("mViewMatrix", mViewMatrix);
-            GLUtility.logMatrix("mProjectionMatrix", mProjectionMatrix);
-        }
 
         // Draw Terrains
         for(GLTerrain glTerrain : glTerrains) {

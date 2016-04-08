@@ -137,7 +137,7 @@ public class GameView extends GLSurfaceView {
                     }
                 }
             }
-            selectedUnit.beginPathing();
+            selectedUnit.beginPathing(x, y);
             pathingUnits.put(pointerId, selectedUnit);
         } else {
             // pointer did not select unit
