@@ -9,7 +9,7 @@ import java.util.Arrays;
 public abstract class Unit extends GameObject {
     private static final String DEBUG_TAG = "Unit";
 
-    public enum UnitType {BASE, ARMY}
+    public enum UnitType {BASE, SOLDIER, ARCHER}
 
     // Unit
     private Player player;  // the player that owns this unit

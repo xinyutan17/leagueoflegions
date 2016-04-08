@@ -3,18 +3,18 @@ package com.example.dennis.leagueoflegions.model.unit;
 import com.example.dennis.leagueoflegions.model.Player;
 import com.example.dennis.leagueoflegions.model.Unit;
 
-public class Army extends Unit {
-    private static final UnitType UNIT_TYPE = UnitType.ARMY;
+public class Archer extends Unit {
+    private static final UnitType UNIT_TYPE = UnitType.ARCHER;
     private static final float DEFAULT_SCALE = 1f;
     private static final float DEFAULT_ROTATION = 0f;
 
     private static final float DEFAULT_SIZE = 5f;
     private static final float DEFAULT_HEALTH = 1f;
     private static final float DEFAULT_DAMAGE = 0.1f;
-    private static final float DEFAULT_RANGE = 30f;
-    private static final float DEFAULT_SPEED = 10f;
+    private static final float DEFAULT_RANGE = 100f;
+    private static final float DEFAULT_SPEED = 7f;
 
-    public Army(Player player, float  x, float y) {
+    public Archer(Player player, float x, float y) {
         super(player, x, y, DEFAULT_SCALE, DEFAULT_ROTATION);
         setBaseSize(DEFAULT_SIZE);
         setBaseHealth(DEFAULT_HEALTH);
@@ -35,12 +35,12 @@ public class Army extends Unit {
     }
 
 
-    public Army split(float x, float y) {
+    public Soldier split(float x, float y) {
         Player player = getPlayer();
-        Army army = new Army(player, x, y);
-        player.addUnit(army);
-        army.setBaseSize(getBaseSize() / 2);
+        Soldier soldier = new Soldier(player, x, y);
+        player.addUnit(soldier);
+        soldier.setBaseSize(getBaseSize() / 2);
         this.setBaseSize(getBaseSize() / 2);
-        return army;
+        return soldier;
     }
 }

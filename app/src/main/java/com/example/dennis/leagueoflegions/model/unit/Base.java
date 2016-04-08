@@ -11,7 +11,7 @@ public class Base extends Unit {
     private static final float DEFAULT_SIZE = 1f;
     private static final float DEFAULT_HEALTH = 10;
     private static final float DEFAULT_DAMAGE = 1f;
-    private static final float DEFAULT_RANGE = 50f;
+    private static final float DEFAULT_RANGE = 200f;
     private static final float DEFAULT_SPEED = 3f;
 
     private static final float DEFAULT_SPAWN_RATE = 3.0f;
@@ -58,7 +58,13 @@ public class Base extends Unit {
             double angle = Math.random() * 2*Math.PI;
             float xOffset = (float)(radius * Math.cos(angle));
             float yOffset = (float)(radius * Math.sin(angle));
-            selfPlayer.addUnit(new Army(selfPlayer, getX() + xOffset, getY() + yOffset));
+            Unit unit;
+            if (Math.random() < 0.5) {
+                unit = new Soldier(selfPlayer, getX() + xOffset, getY() + yOffset);
+            } else {
+                unit = new Archer(selfPlayer, getX() + xOffset, getY() + yOffset);
+            }
+            selfPlayer.addUnit(unit);
             lastSpawnTime = gameTime;
         }
     }

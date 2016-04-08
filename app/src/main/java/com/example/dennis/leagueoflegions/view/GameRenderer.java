@@ -23,12 +23,14 @@ import android.util.Log;
 import com.example.dennis.leagueoflegions.gl.GLTerrain;
 import com.example.dennis.leagueoflegions.gl.GLUnit;
 import com.example.dennis.leagueoflegions.gl.GLUtility;
-import com.example.dennis.leagueoflegions.gl.unit.GLArmy;
+import com.example.dennis.leagueoflegions.gl.unit.GLArcher;
 import com.example.dennis.leagueoflegions.gl.unit.GLBase;
+import com.example.dennis.leagueoflegions.gl.unit.GLSoldier;
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.Unit;
-import com.example.dennis.leagueoflegions.model.unit.Army;
+import com.example.dennis.leagueoflegions.model.unit.Archer;
 import com.example.dennis.leagueoflegions.model.unit.Base;
+import com.example.dennis.leagueoflegions.model.unit.Soldier;
 
 import java.util.ArrayList;
 
@@ -181,12 +183,14 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public void addAllGLUnits(ArrayList<Unit> units) {
         for (Unit unit : units) {
             switch (unit.getUnitType()) {
-                case ARMY:
-                    glUnits.add(new GLArmy((Army) unit));
-                    break;
                 case BASE:
                     glUnits.add(new GLBase((Base) unit));
                     break;
+                case SOLDIER:
+                    glUnits.add(new GLSoldier((Soldier) unit));
+                    break;
+                case ARCHER:
+                    glUnits.add(new GLArcher((Archer) unit));
                 default:
                     Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getUnitType());
             }

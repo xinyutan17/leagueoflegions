@@ -8,7 +8,7 @@ import android.view.ScaleGestureDetector;
 
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.Unit;
-import com.example.dennis.leagueoflegions.model.unit.Army;
+import com.example.dennis.leagueoflegions.model.unit.Soldier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -129,11 +129,11 @@ public class GameView extends GLSurfaceView {
             pathingUnits.remove(pointerId);
         } else if (selectedUnit != null) {
             // pointer selected new unit
-            if (selectedUnit instanceof Army) {
+            if (selectedUnit instanceof Soldier) {
                 // test if splitting
                 for (Unit unit : pathingUnits.values()) {
                     if (unit.equals(selectedUnit)) {
-                        selectedUnit = ((Army) selectedUnit).split(x, y);
+                        selectedUnit = ((Soldier) selectedUnit).split(x, y);
                     }
                 }
             }

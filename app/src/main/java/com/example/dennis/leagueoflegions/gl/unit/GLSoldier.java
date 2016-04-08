@@ -2,14 +2,14 @@ package com.example.dennis.leagueoflegions.gl.unit;
 
 import com.example.dennis.leagueoflegions.gl.GLUnit;
 import com.example.dennis.leagueoflegions.gl.shape.AnimatedCircle;
-import com.example.dennis.leagueoflegions.model.unit.Army;
+import com.example.dennis.leagueoflegions.model.unit.Soldier;
 
-public class GLArmy extends GLUnit {
+public class GLSoldier extends GLUnit {
     private AnimatedCircle bodyAnimatedCircle;
 
-    public GLArmy(Army army) {
-        super(army);
-        bodyAnimatedCircle = new AnimatedCircle(army.getColor());
+    public GLSoldier(Soldier soldier) {
+        super(soldier);
+        bodyAnimatedCircle = new AnimatedCircle(soldier.getColor());
     }
 
     @Override
