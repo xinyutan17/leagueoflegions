@@ -354,10 +354,10 @@ public abstract class Unit extends GameObject {
             return;
         }
 
-//        Log.d(DEBUG_TAG, String.format("Merging %s with %s", toString(), other.toString()));
-
-        setX((getX() + other.getX()) / 2);
-        setY((getY() + other.getY()) / 2);
+        float weight = getSize() / (getSize() + other.getSize());
+        float otherWeight = other.getSize() / (getSize() + other.getSize());
+        setX(weight*getX() + otherWeight*other.getX());
+        setY(weight*getY() + otherWeight*other.getY());
         baseSize = baseSize + other.getSize();
 
         other.destroy();
