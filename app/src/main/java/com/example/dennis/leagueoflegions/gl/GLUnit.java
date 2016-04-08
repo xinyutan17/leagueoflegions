@@ -3,19 +3,20 @@ package com.example.dennis.leagueoflegions.gl;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 
-import com.example.dennis.leagueoflegions.gl.shape.DottedCircle;
+import com.example.dennis.leagueoflegions.gl.shape.Circle;
 import com.example.dennis.leagueoflegions.gl.shape.Line;
 import com.example.dennis.leagueoflegions.model.Unit;
 
 public abstract class GLUnit extends GLObject {
     private Line pathLine;
     private float[] pathVertices;
-    private DottedCircle rangeCircle;
+    private Circle rangeCircle;
 
     public GLUnit(Unit unit) {
         super(unit);
         pathLine = new Line(unit.getColor());
-        rangeCircle = new DottedCircle(unit.getColor());
+        rangeCircle = new Circle(unit.getColor());
+        rangeCircle.setDotted(true);
     }
 
     @Override

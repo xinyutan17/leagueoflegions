@@ -191,6 +191,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                     break;
                 case ARCHER:
                     glUnits.add(new GLArcher((Archer) unit));
+                    break;
                 default:
                     Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getUnitType());
             }

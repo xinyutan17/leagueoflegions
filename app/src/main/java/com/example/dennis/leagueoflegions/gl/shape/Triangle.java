@@ -11,7 +11,7 @@ public class Triangle extends Shape{
     };
 
     public Triangle(float[] color) {
-        super(vertices, GLES20.GL_TRIANGLE_FAN, color);
+        super(vertices, GLES20.GL_LINE_LOOP, color);
     }
 
     @Override
