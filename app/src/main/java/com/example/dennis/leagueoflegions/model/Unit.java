@@ -14,7 +14,6 @@ public abstract class Unit extends GameObject {
     // Unit
     private Player player;  // the player that owns this unit
     private float[] color;  // this unit's color
-    private boolean destroyed;
 
     // Attributes
     // size = sizeMult * baseSize
@@ -47,12 +46,11 @@ public abstract class Unit extends GameObject {
 
     public Unit(Player player, float x, float y, float scale, float rotation)
     {
-        super(x, y, scale, rotation);
+        super(player.getGame(), x, y, scale, rotation);
 
         // Unit
         this.player = player;
         this.color = player.getColor();
-        destroyed = false;
 
         // Attributes
         baseSize = 1f;
@@ -95,13 +93,10 @@ public abstract class Unit extends GameObject {
         this.color = color;
     }
 
-    public boolean isDestroyed() {
-        return destroyed;
-    }
-
+    @Override
     public void destroy() {
-        getPlayer().removeUnit(this);
-        destroyed = true;
+        super.destroy();
+        player.removeUnit(this);
     }
 
     public float getBaseScale() {
@@ -273,7 +268,7 @@ public abstract class Unit extends GameObject {
 
     @Override
     public void tick(){
-        if (destroyed) {
+        if (isDestroyed()) {
             return;
         }
 
@@ -339,7 +334,7 @@ public abstract class Unit extends GameObject {
     }
 
     public void merge(Unit other) {
-        if (destroyed || other.isDestroyed()) {
+        if (isDestroyed() || other.isDestroyed()) {
             return;
         }
         if (other.equals(this)) {

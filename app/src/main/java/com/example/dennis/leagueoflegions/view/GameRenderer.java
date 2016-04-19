@@ -20,12 +20,12 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.example.dennis.leagueoflegions.gl.GLTerrain;
-import com.example.dennis.leagueoflegions.gl.GLUnit;
+import com.example.dennis.leagueoflegions.gl.GLObject;
 import com.example.dennis.leagueoflegions.gl.unit.GLArcher;
 import com.example.dennis.leagueoflegions.gl.unit.GLBase;
 import com.example.dennis.leagueoflegions.gl.unit.GLSoldier;
 import com.example.dennis.leagueoflegions.model.Game;
+import com.example.dennis.leagueoflegions.model.GameObject;
 import com.example.dennis.leagueoflegions.model.Unit;
 import com.example.dennis.leagueoflegions.model.unit.Archer;
 import com.example.dennis.leagueoflegions.model.unit.Base;
@@ -66,17 +66,13 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private float fieldOfViewY;
 
     private Game game;
-    private ArrayList<GLUnit> glUnits;
-    private ArrayList<GLUnit> glUnitRemoveQueue;
-    private ArrayList<GLTerrain> glTerrains;
+    private ArrayList<GLObject> glObjects;
 
     private long mLastTime;
 
     public GameRenderer(Game game) {
         this.game = game;
-        glUnits = new ArrayList<GLUnit>();
-        glUnitRemoveQueue = new ArrayList<GLUnit>();
-        glTerrains = new ArrayList<GLTerrain>();
+        glObjects = new ArrayList<GLObject>();
     }
 
     @Override
@@ -126,18 +122,12 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public void tick() {
         game.tick();
 
-        for (GLUnit glUnit : glUnits) {
-            glUnit.tick();
+        for (GLObject glObject : glObjects) {
+            glObject.tick();
         }
 
-        addAllGLUnits(game.getUnitAddQueue());
-        for (GLUnit glUnit : glUnits) {
-            if (game.getUnitRemoveQueue().contains(glUnit.getGameObject())) {
-                glUnitRemoveQueue.add(glUnit);
-            }
-        }
-        glUnits.removeAll(glUnitRemoveQueue);
-        glUnitRemoveQueue.clear();
+        addAllGLObjects(game.getGameObjectAddQueue());
+        removeAllGLObjects(game.getGameObjectRemoveQueue());
 
         game.tickCleanUp();
     }
@@ -147,14 +137,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(1f, 1f, 1f, 1f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // Draw Terrains
-        for(GLTerrain glTerrain : glTerrains) {
-            glTerrain.draw(mVPMatrix);
-        }
-
-        // Draw Units
-        for (GLUnit glUnit : glUnits) {
-            glUnit.draw(mVPMatrix);
+        // Draw GameObjects
+        for (GLObject glObject : glObjects) {
+            glObject.draw(mVPMatrix);
         }
 
         /**
@@ -167,22 +152,35 @@ public class GameRenderer implements GLSurfaceView.Renderer {
          */
     }
 
-    public void addAllGLUnits(ArrayList<Unit> units) {
-        for (Unit unit : units) {
-            switch (unit.getUnitType()) {
-                case BASE:
-                    glUnits.add(new GLBase((Base) unit));
-                    break;
-                case SOLDIER:
-                    glUnits.add(new GLSoldier((Soldier) unit));
-                    break;
-                case ARCHER:
-                    glUnits.add(new GLArcher((Archer) unit));
-                    break;
-                default:
-                    Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getUnitType());
+    public void addAllGLObjects(ArrayList<GameObject> gameObjects) {
+        for (GameObject gameObject : gameObjects) {
+            if (gameObject instanceof Unit) {
+                Unit unit = (Unit) gameObject;
+                switch (unit.getUnitType()) {
+                    case BASE:
+                        glObjects.add(new GLBase((Base) unit));
+                        break;
+                    case SOLDIER:
+                        glObjects.add(new GLSoldier((Soldier) unit));
+                        break;
+                    case ARCHER:
+                        glObjects.add(new GLArcher((Archer) unit));
+                        break;
+                    default:
+                        Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getUnitType());
+                }
             }
         }
+    }
+
+    public void removeAllGLObjects(ArrayList<GameObject> gameObjects) {
+        ArrayList<GLObject> glObjectRemoveQueue = new ArrayList<GLObject>();
+        for (GLObject glObject : glObjects) {
+            if (gameObjects.contains(glObject.getGameObject())) {
+                glObjectRemoveQueue.add(glObject);
+            }
+        }
+        glObjects.removeAll(glObjectRemoveQueue);
     }
 
     public float getViewX() {

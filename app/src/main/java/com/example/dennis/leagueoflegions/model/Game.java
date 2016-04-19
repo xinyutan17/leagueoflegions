@@ -10,9 +10,11 @@ public class Game {
 
     private Map map;
     private ArrayList<Player> players;
+    private ArrayList<GameObject> gameObjects;
+    private ArrayList<GameObject> gameObjectAddQueue;
+    private ArrayList<GameObject> gameObjectRemoveQueue;
+
     private ArrayList<Unit> units;
-    private ArrayList<Unit> unitAddQueue;
-    private ArrayList<Unit> unitRemoveQueue;
 
     private long startTime;     // start time (milliseconds)
     private float gameTime;     // game time (seconds)
@@ -21,9 +23,11 @@ public class Game {
     public Game(){
         map = new Map();
         players = new ArrayList<Player>();
+        gameObjects = new ArrayList<GameObject>();
+        gameObjectAddQueue = new ArrayList<GameObject>();
+        gameObjectRemoveQueue = new ArrayList<GameObject>();
+
         units = new ArrayList<Unit>();
-        unitAddQueue = new ArrayList<Unit>();
-        unitRemoveQueue = new ArrayList<Unit>();
 
         startTime = System.currentTimeMillis();
         gameTime = 0f;
@@ -41,28 +45,28 @@ public class Game {
         players.add(player);
     }
 
-    public ArrayList<Unit> getUnits() {
-        return units;
+    public ArrayList<GameObject> getGameObjects() {
+        return gameObjects;
     }
 
-    public void addUnit(Unit unit) {
-        units.add(unit);
+    public void addGameObject(GameObject gameObject) {
+        gameObjects.add(gameObject);
     }
 
-    public ArrayList<Unit> getUnitAddQueue() {
-        return unitAddQueue;
+    public ArrayList<GameObject> getGameObjectAddQueue() {
+        return gameObjectAddQueue;
     }
 
-    public void addUnitAddQueue(Unit unit) {
-        unitAddQueue.add(unit);
+    public void addGameObjectAddQueue(GameObject gameObject) {
+        gameObjectAddQueue.add(gameObject);
     }
 
-    public ArrayList<Unit> getUnitRemoveQueue() {
-        return unitRemoveQueue;
+    public ArrayList<GameObject> getGameObjectRemoveQueue() {
+        return gameObjectRemoveQueue;
     }
 
-    public void addUnitRemoveQueue(Unit unit) {
-        unitRemoveQueue.add(unit);
+    public void addGameObjectRemoveQueue(GameObject gameObject) {
+        gameObjectRemoveQueue.add(gameObject);
     }
 
     public float getTime() {
@@ -78,18 +82,25 @@ public class Game {
         gameTime = (System.currentTimeMillis() - startTime)/1000f;
         elapsedTime = gameTime - prevGameTime;
 
-        for(Unit unit : units) {
-            unit.tick();
+        units.clear();
+        for (GameObject gameObject : gameObjects) {
+            if (gameObject instanceof Unit) {
+                units.add((Unit) gameObject);
+            }
         }
 
-        units.addAll(unitAddQueue);
-        units.removeAll(unitRemoveQueue);
+        for(GameObject gameObject : gameObjects) {
+            gameObject.tick();
+        }
+
+        gameObjects.addAll(gameObjectAddQueue);
+        gameObjects.removeAll(gameObjectRemoveQueue);
     }
 
     public void tickCleanUp() {
         // This should be called immediately after tick
-        unitAddQueue.clear();
-        unitRemoveQueue.clear();
+        gameObjectAddQueue.clear();
+        gameObjectRemoveQueue.clear();
     }
 
     public ArrayList<Unit> getUnitsWithinRadius(float x, float y, float radius) {
