@@ -21,11 +21,13 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.example.dennis.leagueoflegions.gl.GLObject;
+import com.example.dennis.leagueoflegions.gl.GLProjectile;
 import com.example.dennis.leagueoflegions.gl.unit.GLArcher;
 import com.example.dennis.leagueoflegions.gl.unit.GLBase;
 import com.example.dennis.leagueoflegions.gl.unit.GLSoldier;
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.GameObject;
+import com.example.dennis.leagueoflegions.model.Projectile;
 import com.example.dennis.leagueoflegions.model.Unit;
 import com.example.dennis.leagueoflegions.model.unit.Archer;
 import com.example.dennis.leagueoflegions.model.unit.Base;
@@ -169,6 +171,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                     default:
                         Log.e(DEBUG_TAG, "unknown UnitType: " + unit.getUnitType());
                 }
+            } else if (gameObject instanceof Projectile) {
+                glObjects.add(new GLProjectile((Projectile) gameObject));
             }
         }
     }

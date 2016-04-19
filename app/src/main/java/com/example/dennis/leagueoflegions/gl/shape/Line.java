@@ -7,8 +7,7 @@ public class Line extends Shape {
     public Line(float[] color) {
         super(color);
         setGL_DRAW_TYPE(GLES20.GL_LINE_STRIP);
-        // vertices and drawOrder must be set manually by calling
-        // setVertices() and setDrawOrder()
+        // vertices must be set manually by calling setVertices()
     }
 
     @Override

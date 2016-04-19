@@ -272,7 +272,7 @@ public abstract class Unit extends GameObject {
             return;
         }
 
-        Game game = getPlayer().getGame();
+        Game game = getGame();
         ArrayList<Unit> units = game.getEnemyUnitsWithinRadius(getPlayer(), getX(), getY(), getRange());
         float[] randomLottery = randomLottery(units.size());
         for (int i = 0; i < units.size(); i++) {
@@ -304,7 +304,9 @@ public abstract class Unit extends GameObject {
     }
 
     public void sendDamage(Unit unit, float damage) {
-        unit.receiveDamage(damage);
+        float dir = (float) Math.atan2(unit.getY() - getY(), unit.getX() - getX());
+        Projectile proj = new Projectile(getGame(), getPlayer(), getX(), getY(), dir, getRange(), damage);
+//        unit.receiveDamage(damage);
     }
 
     public void receiveDamage(float damage) {
