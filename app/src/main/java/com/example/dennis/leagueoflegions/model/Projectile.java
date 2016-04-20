@@ -3,7 +3,7 @@ package com.example.dennis.leagueoflegions.model;
 import java.util.ArrayList;
 
 public class Projectile extends GameObject {
-    private static final float DEFAULT_SCALE = 3.0f;
+    private static final float DEFAULT_SCALE = 1.0f;
     private static final float DEFAULT_SPEED = 500f;
     private static final float DAMAGE_RADIUS = 3.0f;
 
