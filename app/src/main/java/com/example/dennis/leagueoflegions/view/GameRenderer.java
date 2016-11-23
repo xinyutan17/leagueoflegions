@@ -109,7 +109,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
 
     @Override
-    public void onDrawFrame(GL10 unused) {
+    public synchronized void onDrawFrame(GL10 unused) {
         long now = System.currentTimeMillis();
         if (now - mLastTime < 1000.0/FPS) {
             return;
