@@ -1,7 +1,12 @@
-package com.example.dennis.leagueoflegions.model;
+package com.example.dennis.leagueoflegions.model.unit;
 
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+
+import com.example.dennis.leagueoflegions.model.Game;
+import com.example.dennis.leagueoflegions.model.GameObject;
+import com.example.dennis.leagueoflegions.model.Player;
+import com.example.dennis.leagueoflegions.model.Projectile;
 
 import java.util.ArrayList;
 import java.util.Arrays;

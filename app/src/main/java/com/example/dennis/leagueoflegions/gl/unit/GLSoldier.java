@@ -1,6 +1,5 @@
 package com.example.dennis.leagueoflegions.gl.unit;
 
-import com.example.dennis.leagueoflegions.gl.GLUnit;
 import com.example.dennis.leagueoflegions.gl.shape.ShiftingCircle;
 import com.example.dennis.leagueoflegions.model.unit.Soldier;
 

@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.example.dennis.leagueoflegions.gl.GLTerrain;
-import com.example.dennis.leagueoflegions.gl.GLUnit;
+import com.example.dennis.leagueoflegions.gl.unit.GLUnit;
 import com.example.dennis.leagueoflegions.model.Game;
 
 import java.util.ArrayList;

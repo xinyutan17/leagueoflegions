@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 import com.example.dennis.leagueoflegions.model.Game;
-import com.example.dennis.leagueoflegions.model.Unit;
+import com.example.dennis.leagueoflegions.model.unit.Unit;
 import com.example.dennis.leagueoflegions.model.unit.Soldier;
 
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
 package com.example.dennis.leagueoflegions.model;
 
 import com.example.dennis.leagueoflegions.model.unit.Base;
+import com.example.dennis.leagueoflegions.model.unit.Unit;
 
 import java.util.ArrayList;
 

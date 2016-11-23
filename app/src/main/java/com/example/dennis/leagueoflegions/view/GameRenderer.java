@@ -28,7 +28,7 @@ import com.example.dennis.leagueoflegions.gl.unit.GLSoldier;
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.GameObject;
 import com.example.dennis.leagueoflegions.model.Projectile;
-import com.example.dennis.leagueoflegions.model.Unit;
+import com.example.dennis.leagueoflegions.model.unit.Unit;
 import com.example.dennis.leagueoflegions.model.unit.Archer;
 import com.example.dennis.leagueoflegions.model.unit.Base;
 import com.example.dennis.leagueoflegions.model.unit.Soldier;

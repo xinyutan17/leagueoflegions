@@ -1,11 +1,12 @@
-package com.example.dennis.leagueoflegions.gl;
+package com.example.dennis.leagueoflegions.gl.unit;
 
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 
+import com.example.dennis.leagueoflegions.gl.GLObject;
 import com.example.dennis.leagueoflegions.gl.shape.Circle;
 import com.example.dennis.leagueoflegions.gl.shape.Line;
-import com.example.dennis.leagueoflegions.model.Unit;
+import com.example.dennis.leagueoflegions.model.unit.Unit;
 
 public abstract class GLUnit extends GLObject {
     private Line pathLine;
