@@ -45,6 +45,12 @@ public class GameView extends GLSurfaceView {
                 mRenderer.setView(viewX, viewY);
                 return true;
             }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent event) {
+                mRenderer.setView(0f, 0f);
+                return true;
+            }
         });
 
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {

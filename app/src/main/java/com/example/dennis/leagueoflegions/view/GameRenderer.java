@@ -216,7 +216,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public void setFieldOfViewY(float fovy) {
         fieldOfViewY = fovy;
 
-        Matrix.perspectiveM(mProjectionMatrix, 0, fieldOfViewY, viewportRatio, -1, 1);
+        Matrix.perspectiveM(mProjectionMatrix, 0, fieldOfViewY, viewportRatio, CAMERA_DISTANCE, CAMERA_DISTANCE + MAX_DEPTH);
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
     }
 
@@ -226,7 +226,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         float[] screenCoors = new float[4];
         screenCoors[0] = 2f * screenX / screenWidth - 1f;
         screenCoors[1] = 2f * screenY / screenHeight - 1f;
-        screenCoors[2] = 0f;// / CAMERA_DISTANCE;  // THE MAGIC VALUE
+        screenCoors[2] = 0f;
         screenCoors[3] = 1f;
 
         return screenCoors;
