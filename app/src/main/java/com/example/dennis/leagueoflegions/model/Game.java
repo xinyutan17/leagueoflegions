@@ -1,6 +1,5 @@
 package com.example.dennis.leagueoflegions.model;
 
-import com.example.dennis.leagueoflegions.model.unit.Base;
 import com.example.dennis.leagueoflegions.model.unit.Unit;
 
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ public class Game {
     public enum GameType {CAMPAIGN, MULTIPLAYER, TUTORIAL}
 
     private Map map;
+    private Player currentPlayer;
     private ArrayList<Player> players;
     private ArrayList<GameObject> gameObjects;
     private ArrayList<GameObject> gameObjectAddQueue;
@@ -23,6 +23,7 @@ public class Game {
 
     public Game(){
         map = new Map();
+        currentPlayer = null;
         players = new ArrayList<Player>();
         gameObjects = new ArrayList<GameObject>();
         gameObjectAddQueue = new ArrayList<GameObject>();
@@ -35,14 +36,20 @@ public class Game {
         elapsedTime = 0f;
     }
 
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player player) {
+        currentPlayer = player;
+    }
+
     public ArrayList<Player> getPlayers()
     {
         return players;
     }
 
-    public void addPlayer(float[] color, float baseX, float baseY) {
-        Player player = new Player(this, color);
-        player.addUnit(new Base(player, baseX, baseY));
+    public void addPlayer(Player player) {
         players.add(player);
     }
 
