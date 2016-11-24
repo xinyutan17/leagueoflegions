@@ -65,7 +65,7 @@ public abstract class Unit extends GameObject {
         baseHealth = 1f;
         baseDamage = 1f;
         baseRange = 1f;
-        baseVision = 2f;
+        baseVision = 1f;
 
         // Modifiers
         sizeMult = 1f;

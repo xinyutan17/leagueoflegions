@@ -33,15 +33,15 @@ public class GameActivity extends Activity {
         float[] green = {0f, 1f, 0f, 1f};
 
         Player p1 = new Player(game, blue);
-        p1.addUnit(new Base(p1, -500f, 0f));
+        p1.addUnit(new Base(p1, 0f, 0f));
         game.addPlayer(p1);
 
         Player p2 = new Player(game, green);
-        p2.addUnit(new Base(p2, 0f, 0f));
+        p2.addUnit(new Base(p2, 0f, 1500f));
         game.addPlayer(p2);
 
         Player p3 = new Player(game, red);
-        p3.addUnit(new Base(p3, 500f, 0f));
+        p3.addUnit(new Base(p3, 1500f, 0f));
         game.addPlayer(p3);
 
         game.setCurrentPlayer(p1);

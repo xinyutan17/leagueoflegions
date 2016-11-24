@@ -11,7 +11,7 @@ public class Archer extends Unit {
     private static final float DEFAULT_HEALTH = 1f;
     private static final float DEFAULT_DAMAGE = 0.1f;
     private static final float DEFAULT_RANGE = 100f;
-    private static final float DEFAULT_VISION = 200f;
+    private static final float DEFAULT_VISION = 500f;
     private static final float DEFAULT_SPEED = 7f;
 
     public Archer(Player player, float x, float y) {

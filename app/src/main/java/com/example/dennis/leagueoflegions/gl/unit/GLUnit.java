@@ -54,7 +54,11 @@ public abstract class GLUnit extends GLObject {
         super.draw(mVPMatrix);
         if (!((Unit) getGameObject()).getRemainingPath().isEmpty())
             pathLine.draw(mVPMatrix);
-        rangeCircle.draw(getMVPMatrix());
-        visionCircle.draw(getMVPMatrix());
+
+        Unit unit = (Unit) getGameObject();
+        if (unit.getPlayer().equals(unit.getGame().getCurrentPlayer())) {
+            rangeCircle.draw(getMVPMatrix());
+            visionCircle.draw(getMVPMatrix());
+        }
     }
 }

@@ -34,6 +34,7 @@ import com.example.dennis.leagueoflegions.model.unit.Soldier;
 import com.example.dennis.leagueoflegions.model.unit.Unit;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -51,7 +52,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private static final String DEBUG_TAG = "GameRenderer";
     private static final String[] DEBUG_TEXT = new String[]{"","","","",""};
 
-    private static final float CAMERA_DISTANCE = 500f;
+    private static final float CAMERA_DISTANCE = 1000f;
     private static final float MAX_DEPTH = 10f;             // game objects must be placed between z = 0 and z = -MAX_DEPTH
     public static final float MIN_FOVY = 30f;
     public static final float MAX_FOVY = 150f;
@@ -70,12 +71,14 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     private Game game;
     private ArrayList<GLObject> glObjects;
+    private ArrayList<GLObject> visibleGLObjects;
 
     private long mLastTime;
 
     public GameRenderer(Game game) {
         this.game = game;
         glObjects = new ArrayList<GLObject>();
+        visibleGLObjects = new ArrayList<GLObject>();
     }
 
     @Override
@@ -115,6 +118,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public synchronized void onDrawFrame(GL10 unused) {
+        // TODO: separate game tick from draw tick
         long now = System.currentTimeMillis();
         if (now - mLastTime < 1000.0/FPS) {
             return;
@@ -127,6 +131,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
 
     public void tick() {
+        // Game tick
         game.tick();
 
         for (GLObject glObject : glObjects) {
@@ -137,6 +142,20 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         removeAllGLObjects(game.getGameObjectRemoveQueue());
 
         game.tickCleanUp();
+
+        // Update visible game objects
+        ArrayList<GameObject> visibleGameObjects = new ArrayList<GameObject>();
+        for (Unit unit : game.getCurrentPlayer().getUnits()) {
+            visibleGameObjects.addAll(game.getGameObjectsWithinRadius(unit, unit.getVision()));
+        }
+        visibleGameObjects = new ArrayList<GameObject>(new HashSet<GameObject>(visibleGameObjects));
+
+        visibleGLObjects.clear();
+        for (GLObject glObject : glObjects) {
+            if (visibleGameObjects.contains(glObject.getGameObject())) {
+                visibleGLObjects.add(glObject);
+            }
+        }
     }
 
     private void draw() {
@@ -144,8 +163,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0f, 0f, 0f, 1f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // Draw GameObjects
-        for (GLObject glObject : glObjects) {
+        // Draw visible GameObjects
+        for (GLObject glObject : visibleGLObjects) {
             glObject.draw(mVPMatrix);
         }
 

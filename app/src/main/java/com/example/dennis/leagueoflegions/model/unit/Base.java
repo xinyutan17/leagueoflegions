@@ -11,7 +11,7 @@ public class Base extends Unit {
     private static final float DEFAULT_HEALTH = 10;
     private static final float DEFAULT_DAMAGE = 1f;
     private static final float DEFAULT_RANGE = 200f;
-    private static final float DEFAULT_VISION = 400f;
+    private static final float DEFAULT_VISION = 1000f;
     private static final float DEFAULT_SPEED = 3f;
 
     private static final float DEFAULT_SPAWN_RATE = 3.0f;

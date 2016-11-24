@@ -111,6 +111,18 @@ public class Game {
         gameObjectRemoveQueue.clear();
     }
 
+    public ArrayList<GameObject> getGameObjectsWithinRadius(GameObject gameObject, float radius) {
+        ArrayList<GameObject> gameObjectsWithinRadius = new ArrayList<GameObject>();
+        for (GameObject obj : gameObjects) {
+            float dx = obj.getX() - gameObject.getX();
+            float dy = obj.getY() - gameObject.getY();
+            if (dx*dx + dy*dy <= radius*radius) {
+                gameObjectsWithinRadius.add(obj);
+            }
+        }
+        return gameObjectsWithinRadius;
+    }
+
     public ArrayList<Unit> getUnitsWithinRadius(float x, float y, float radius) {
         ArrayList<Unit> unitsWithinRadius = new ArrayList<Unit>();
         for (Unit unit : units) {
