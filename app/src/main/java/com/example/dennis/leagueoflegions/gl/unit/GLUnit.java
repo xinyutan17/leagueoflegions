@@ -5,6 +5,7 @@ import android.graphics.PathMeasure;
 
 import com.example.dennis.leagueoflegions.gl.GLObject;
 import com.example.dennis.leagueoflegions.gl.shape.Circle;
+import com.example.dennis.leagueoflegions.gl.shape.FilledCircle;
 import com.example.dennis.leagueoflegions.gl.shape.Line;
 import com.example.dennis.leagueoflegions.model.unit.Unit;
 
@@ -12,12 +13,17 @@ public abstract class GLUnit extends GLObject {
     private Line pathLine;
     private float[] pathVertices;
     private Circle rangeCircle;
+    private FilledCircle visionCircle;
+
+    private static final float[] VISION_COLOR = new float[]{1.0f, 1.0f, 1.0f, 0.0f};
 
     public GLUnit(Unit unit) {
         super(unit);
         pathLine = new Line(unit.getColor());
         rangeCircle = new Circle(unit.getColor());
         rangeCircle.setDotted(true);
+        visionCircle = new FilledCircle(VISION_COLOR);
+        visionCircle.setZ(-1f);
     }
 
     @Override
@@ -40,6 +46,7 @@ public abstract class GLUnit extends GLObject {
         }
 
         rangeCircle.setScale(unit.getRange() / unit.getScale());
+        visionCircle.setScale(unit.getVision() / unit.getScale());
     }
 
     @Override
@@ -48,5 +55,6 @@ public abstract class GLUnit extends GLObject {
         if (!((Unit) getGameObject()).getRemainingPath().isEmpty())
             pathLine.draw(mVPMatrix);
         rangeCircle.draw(getMVPMatrix());
+        visionCircle.draw(getMVPMatrix());
     }
 }

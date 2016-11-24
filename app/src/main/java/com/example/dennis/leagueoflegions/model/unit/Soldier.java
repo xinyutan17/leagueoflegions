@@ -11,6 +11,7 @@ public class Soldier extends Unit {
     private static final float DEFAULT_HEALTH = 1f;
     private static final float DEFAULT_DAMAGE = 0.1f;
     private static final float DEFAULT_RANGE = 50f;
+    private static final float DEFAULT_VISION = 100f;
     private static final float DEFAULT_SPEED = 10f;
 
     public Soldier(Player player, float x, float y) {
@@ -19,6 +20,7 @@ public class Soldier extends Unit {
         setBaseHealth(DEFAULT_HEALTH);
         setBaseDamage(DEFAULT_DAMAGE);
         setBaseRange(DEFAULT_RANGE);
+        setBaseVision(DEFAULT_VISION);
         setBaseSpeed(DEFAULT_SPEED);
     }
 

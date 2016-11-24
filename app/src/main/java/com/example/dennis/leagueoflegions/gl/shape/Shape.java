@@ -30,32 +30,35 @@ public abstract class Shape {
     private ShortBuffer drawOrderBuffer;
     private int GL_DRAW_TYPE;       // GL_TRIANGLES, GL_TRIANGLE_FAN, GL_TRIANGLE_STRIP
 
-    private float[] color;          // the color of the Shape (rgba)
-    private float scale;            // the scale of the Shape (scaling before model's scaling)
-    private float[] mScaleMatrix;   // the scale matrix
-    private float[] mMVPMatrixScaled;
+    private float[] color;              // the color of the Shape (rgba)
+    private float scale;                // the scale of the Shape (scaling before model's scaling)
+    private float z;                    // the z-translation of the Shape
+    private float[] mTransformMatrix;   // the transform matrix (local scaling, rotation, translation)
+    private float[] mTransformMVPMatrix;
 
     public Shape(float[] vertices, int GL_DRAW_TYPE, float[] color) {
         createProgram();
-        mScaleMatrix = new float[16];
-        mMVPMatrixScaled = new float[16];
+        mTransformMatrix = new float[16];
+        mTransformMVPMatrix = new float[16];
 
         setVertices(vertices);
         setGL_DRAW_TYPE(GL_DRAW_TYPE);
         setColor(color);
         setScale(1f);
+        setZ(0f);
     }
 
     public Shape(float[] color) {
         createProgram();
-        mScaleMatrix = new float[16];
-        mMVPMatrixScaled = new float[16];
+        mTransformMatrix = new float[16];
+        mTransformMVPMatrix = new float[16];
 
         vertices = null;
         drawOrder = null;
         GL_DRAW_TYPE = -1;
         setColor(color);
         setScale(1f);
+        setZ(0f);
     }
 
     public String getVertexShaderCode() {
@@ -144,9 +147,23 @@ public abstract class Shape {
 
     public void setScale(float scale) {
         this.scale = scale;
+        updateTransformMatrix();
+    }
 
-        Matrix.setIdentityM(mScaleMatrix, 0);
-        Matrix.scaleM(mScaleMatrix, 0, scale, scale, 1f);
+    public float getZ() {
+        return z;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+        updateTransformMatrix();
+    }
+
+    private void updateTransformMatrix() {
+        Matrix.setIdentityM(mTransformMatrix, 0);
+        Matrix.translateM(mTransformMatrix, 0, 0, 0, z);
+        Matrix.scaleM(mTransformMatrix, 0, scale, scale, 1f);
+        // GLUtility.logMatrix("mTransformMatrix", mTransformMatrix);
     }
 
     public void tick() {
@@ -154,7 +171,7 @@ public abstract class Shape {
     }
 
     public void draw(float[] mMVPMatrix) {
-        Matrix.multiplyMM(mMVPMatrixScaled, 0, mMVPMatrix, 0, mScaleMatrix, 0);
+        Matrix.multiplyMM(mTransformMVPMatrix, 0, mMVPMatrix, 0, mTransformMatrix, 0);
 
         if (vertices == null || drawOrder == null || GL_DRAW_TYPE == -1) {
             Log.e(DEBUG_TAG,  "failed to draw shape " + toString() + ": null vertices, drawOrder, or GL_DRAW_TYPE");
@@ -172,7 +189,7 @@ public abstract class Shape {
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         GLUtility.checkGlError("glGetUniformLocation");
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrixScaled, 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mTransformMVPMatrix, 0);
         GLUtility.checkGlError("glUniformMatrix4fv");
 
         GLES20.glLineWidth(2f); // TODO: only do this when drawing lines

@@ -11,6 +11,7 @@ public class Base extends Unit {
     private static final float DEFAULT_HEALTH = 10;
     private static final float DEFAULT_DAMAGE = 1f;
     private static final float DEFAULT_RANGE = 200f;
+    private static final float DEFAULT_VISION = 400f;
     private static final float DEFAULT_SPEED = 3f;
 
     private static final float DEFAULT_SPAWN_RATE = 3.0f;
@@ -26,6 +27,7 @@ public class Base extends Unit {
         setBaseHealth(DEFAULT_HEALTH);
         setBaseDamage(DEFAULT_DAMAGE);
         setBaseRange(DEFAULT_RANGE);
+        setBaseVision(DEFAULT_VISION);
         setBaseSpeed(DEFAULT_SPEED);
 
         spawnRate = DEFAULT_SPAWN_RATE;

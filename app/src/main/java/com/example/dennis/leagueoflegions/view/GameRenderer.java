@@ -28,10 +28,10 @@ import com.example.dennis.leagueoflegions.gl.unit.GLSoldier;
 import com.example.dennis.leagueoflegions.model.Game;
 import com.example.dennis.leagueoflegions.model.GameObject;
 import com.example.dennis.leagueoflegions.model.Projectile;
-import com.example.dennis.leagueoflegions.model.unit.Unit;
 import com.example.dennis.leagueoflegions.model.unit.Archer;
 import com.example.dennis.leagueoflegions.model.unit.Base;
 import com.example.dennis.leagueoflegions.model.unit.Soldier;
+import com.example.dennis.leagueoflegions.model.unit.Unit;
 
 import java.util.ArrayList;
 
@@ -52,6 +52,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private static final String[] DEBUG_TEXT = new String[]{"","","","",""};
 
     private static final float CAMERA_DISTANCE = 500f;
+    private static final float MAX_DEPTH = 10f;             // game objects must be placed between z = 0 and z = -MAX_DEPTH
     public static final float MIN_FOVY = 30f;
     public static final float MAX_FOVY = 150f;
     public static final int FPS = 60;
@@ -79,8 +80,12 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
         // Set the background frame color
-        GLES20.glClearColor(1f, 1f, 1f, 1f);
+        GLES20.glClearColor(0f, 0f, 0f, 1f);
 
         viewX = 0f;
         viewY = 0f;
@@ -102,9 +107,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         viewportRatio = (float) width / height;
 
         // Setup view-projection matrix
-        Matrix.perspectiveM(mProjectionMatrix, 0, fieldOfViewY, viewportRatio, -1, 1);
         Matrix.setLookAtM(mViewMatrix, 0, 0, 0, CAMERA_DISTANCE, 0, 0, 0f, 0f, 1.0f, 0.0f);
         Matrix.translateM(mViewMatrix, 0, -viewX, -viewY, 0f);
+        Matrix.perspectiveM(mProjectionMatrix, 0, fieldOfViewY, viewportRatio, CAMERA_DISTANCE, CAMERA_DISTANCE + MAX_DEPTH);
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
     }
 
@@ -136,7 +141,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     private void draw() {
         // Draw background
-        GLES20.glClearColor(1f, 1f, 1f, 1f);
+        GLES20.glClearColor(0f, 0f, 0f, 1f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // Draw GameObjects
@@ -221,7 +226,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         float[] screenCoors = new float[4];
         screenCoors[0] = 2f * screenX / screenWidth - 1f;
         screenCoors[1] = 2f * screenY / screenHeight - 1f;
-        screenCoors[2] = 1f / CAMERA_DISTANCE;  // THE MAGIC VALUE
+        screenCoors[2] = 0f;// / CAMERA_DISTANCE;  // THE MAGIC VALUE
         screenCoors[3] = 1f;
 
         return screenCoors;

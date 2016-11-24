@@ -33,6 +33,7 @@ public abstract class Unit extends GameObject {
     private float baseHealth;   // the baseHealth of each individual
     private float baseDamage;   // the baseDamage per second of each individual
     private float baseRange;    // the unit's baseRange
+    private float baseVision;   // the unit's baseVision
     private float baseSpeed;    // the unit's baseSpeed
 
     // Attribute multipliers (set by Terrain elements)
@@ -40,6 +41,7 @@ public abstract class Unit extends GameObject {
     private float healthMult;
     private float damageMult;
     private float rangeMult;
+    private float visionMult;
     private float speedMult;
 
     // Path
@@ -63,6 +65,7 @@ public abstract class Unit extends GameObject {
         baseHealth = 1f;
         baseDamage = 1f;
         baseRange = 1f;
+        baseVision = 2f;
 
         // Modifiers
         sizeMult = 1f;
@@ -70,6 +73,7 @@ public abstract class Unit extends GameObject {
         healthMult = 1f;
         damageMult = 1f;
         rangeMult = 1f;
+        visionMult = 1f;
 
         // Path
         pathing = false;
@@ -179,6 +183,18 @@ public abstract class Unit extends GameObject {
         this.baseRange = range;
     }
 
+    public float getVision() {
+        return visionMult * baseVision + getScale();
+    }
+
+    public float getBaseVision() {
+        return baseVision;
+    }
+
+    public void setBaseVision(float vision) {
+        this.baseVision = vision;
+    }
+
     // Modifiers
 
     public float getSizeMult() {
@@ -219,6 +235,14 @@ public abstract class Unit extends GameObject {
 
     public void setRangeMult(float range_mult) {
         this.rangeMult = range_mult;
+    }
+
+    public float getVisionMult() {
+        return visionMult;
+    }
+
+    public void setVisionMult(float vision_mult) {
+        this.visionMult = vision_mult;
     }
 
     // Path
