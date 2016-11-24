@@ -69,4 +69,17 @@ public class GLUtility {
         }
         Log.d(DEBUG_TAG, "\n");
     }
+
+    /**
+     * Log a 4x1 vector.
+     * @param name
+     * @param vector
+     */
+    public static void logVector(String name, float[] vector) {
+        if (vector.length != 4) {
+            return;
+        }
+        Log.d(DEBUG_TAG, String.format("%8s: (%8.2f, %8.2f, %8.2f, %8.2f)",
+                name, vector[0], vector[1], vector[2], vector[3]));
+    }
 }

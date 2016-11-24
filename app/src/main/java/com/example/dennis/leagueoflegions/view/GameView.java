@@ -48,7 +48,9 @@ public class GameView extends GLSurfaceView {
 
             @Override
             public boolean onDoubleTap(MotionEvent event) {
-                mRenderer.setView(0f, 0f);
+                float[] screenCoors = mRenderer.getScreenCoors(event.getX(), event.getY());
+                float[] worldCoors = mRenderer.screenToWorld(screenCoors);
+                mRenderer.setView(worldCoors[0], worldCoors[1]);
                 return true;
             }
         });
